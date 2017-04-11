@@ -5,6 +5,7 @@ function Player() {
     this.vx = 0
     this.vy = 0
     this.speed = 5
+    this.easing = 0.85
 
     this.setupKeyboard = () => {
         const W = keyboard(87),
@@ -14,37 +15,49 @@ function Player() {
 
         W.press = () => {
             this.vy = -this.speed
+            this.ySlowing = false
         }
         W.release = () => {
             if (!S.isDown) {
-                this.vy = 0
+                this.ySlowing = true
+            } else {
+                this.vy = this.speed
             }
         }
 
         A.press = () => {
             this.vx = -this.speed
+            this.xSlowing = false
         }
         A.release = () => {
             if (!D.isDown) {
-                this.vx = 0
+                this.xSlowing = true
+            } else {
+                this.vx = this.speed
             }
         }
 
         S.press = () => {
             this.vy = this.speed
+            this.ySlowing = false
         }
         S.release = () => {
             if (!W.isDown) {
-                this.vy = 0
+                this.ySlowing = true
+            } else {
+                this.vy = -this.speed
             }
         }
 
         D.press = () => {
             this.vx = this.speed
+            this.xSlowing = false
         }
         D.release = () => {
             if (!A.isDown) {
-                this.vx = 0
+                this.xSlowing = true
+            } else {
+                this.vx = -this.speed
             }
         }
     }
@@ -67,6 +80,13 @@ function Player() {
 
         this.sprite.x += this.vx
         this.sprite.y += this.vy
+
+        if (this.xSlowing) {
+            this.vx *= this.easing
+        }
+        if (this.ySlowing) {
+            this.vy *= this.easing
+        }
 
     }
 
