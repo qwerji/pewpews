@@ -1,5 +1,8 @@
 //Create the renderer
-var renderer = PIXI.autoDetectRenderer(256, 256);
+var renderer = PIXI.autoDetectRenderer(
+    256, 256,
+    {antialias: true, resolution: 2}
+);
 
 //Add the canvas to the HTML document
 document.body.appendChild(renderer.view);
@@ -13,6 +16,11 @@ renderer.view.style.position = "absolute";
 renderer.view.style.display = "block";
 renderer.autoResize = true;
 renderer.resize(window.innerWidth, window.innerHeight);
+// renderer.view.style.width = window.innerWidth
+// renderer.view.style.height = window.innerHeight
+
+// Initialize Collision Library
+const BUMP = new Bump()
 
 const game = new Game()
 

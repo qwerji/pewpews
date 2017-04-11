@@ -4,7 +4,7 @@ function Player() {
     this.sprite = null
     this.vx = 0
     this.vy = 0
-    this.speed = 5
+    this.speed = 10
     this.easing = 0.85
 
     this.setupKeyboard = () => {
@@ -60,6 +60,7 @@ function Player() {
                 this.vx = -this.speed
             }
         }
+
     }
 
     this.setup = (texture, stage) => {
