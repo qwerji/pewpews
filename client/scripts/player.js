@@ -2,6 +2,7 @@ function Player() {
     
     this.texture = null
     this.sprite = null
+    this.gamePad = null
     this.socket = {
             id:1
     }

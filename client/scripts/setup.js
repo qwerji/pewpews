@@ -24,11 +24,10 @@ renderer.resize(window.innerWidth, window.innerHeight);
 const BUMP = new Bump()
 
 const game = new Game()
-
+const gamePad = new Gamepad()
+gamePad.setup()
 PIXI.loader
     .add('demon', 'images/sprites/fat.png')
     .add('obstacle', 'images/sprites/obstacle.png')
     .add('spear', 'images/sprites/spear.png')
     .load(game.setup)
-
-
