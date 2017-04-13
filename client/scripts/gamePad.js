@@ -1,32 +1,48 @@
 function Gamepad(){
 	
-	this.gamePads = navigator.getGamepads()
+	// Returns the gamepads array
+	this.gamePads = () => { 
+		return navigator.getGamepads()
+	}
+
 	function canGame() {
 		return "getGamepads" in navigator;
 	}
 
-	function reportOnGamepad() {
-		var gp = navigator.getGamepads()[0];
-		console.log(navigator.getGamepads())
+	this.getGamepadInfo = i => {
+		return navigator.getGamepads()[i];
 	}
 		
 	this.setup = () => {
-		const _this = this
 		if(canGame()) {
-			console.log("WE CAN GAME is woking")
-			//setup an interval for Chrome
-			var checkGP = window.setInterval(function() {
-				for(var k = _this.gamePads.length - 1; k >= 0;k--){
-					for (var idx = 0; idx < game.players.length; idx++) {
-						if(_this.gamePads[k] && !(_this.gamePads[k] === game.players[idx].gamePad)){
-							game.addPlayer(_this.gamePads[k])
-							console.log("Player vs Gamepad check is woking")
+			// Check for new game pads at interval
+			var checkGP = setInterval(function() {
+				const gps = this.gamePads()
+				// For each gamepad slot
+				for(var k = gps.length - 1; k >= 0;k--){
+					const gamePad = gps[k]
+
+					// If there is a controller in the slot
+					if (gamePad) {
+						// Assume it's not in use
+						let inUse = false
+						// Check against each player
+						for (var idx = game.players.length - 1; idx >= 0; idx--) {
+							const playerGamePadIndex = game.players[idx].gamePadIndex
+							// If the player is not using a keyboard, and they are using that controller's slot
+							if((playerGamePadIndex !== undefined) && (gamePad.index === playerGamePadIndex)) {
+								inUse = true
+								break
+							}
+						}
+						if (!inUse) {
+							// Add a new player with that controller
+							game.addPlayer(gamePad.index)
 						}
 					}
 				}
-				reportOnGamepad()
-				console.log("This is woking")
-			}, 5000);
+				// clearInterval(checkGP)
+			}.bind(this), 5000);
 		}
 		
 	};	

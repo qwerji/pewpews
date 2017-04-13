@@ -2,3 +2,10 @@
     margin: 0;
     padding: 0;
 }
+
+p#fpsDisplay {
+    font-family: sans-serif;
+    position: fixed;
+    color: white;
+    z-index: 5;
+}
