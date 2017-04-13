@@ -11,6 +11,7 @@ A local multi-player 2D pewpew game
 Pull from dev branch for latest working build.
 ``` bash
 npm install
+bower install
 ```
 
 ## Usage
