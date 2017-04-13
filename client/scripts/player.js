@@ -13,7 +13,7 @@ function Player(gamePadIndex) {
     //Movement
     this.vx = 0
     this.vy = 0
-    this.speed = 5
+    this.speed = 250
     this.easing = 0.85
 
     //Shooting
@@ -295,8 +295,8 @@ function Player(gamePadIndex) {
             this.updatePadInput()
         }
 
-        this.sprite.x += this.vx
-        this.sprite.y += this.vy
+        this.sprite.x += this.vx * game.deltaTime
+        this.sprite.y += this.vy * game.deltaTime
 
         if (this.xSlowing) {
             this.vx *= this.easing

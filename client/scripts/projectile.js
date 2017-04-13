@@ -4,7 +4,7 @@ function Projectile() {
     this.sprite = null
     this.vx = 0
     this.vy = 0
-    this.speed = 7
+    this.speed = 325
     this.easing = 1
     this.source = null
     this.damage = 0
@@ -51,8 +51,8 @@ function Projectile() {
     }
     this.update = () => {
 
-        this.sprite.x += this.vx
-        this.sprite.y += this.vy
+        this.sprite.x += this.vx * game.deltaTime
+        this.sprite.y += this.vy * game.deltaTime
 
         //Easing
         // if (this.xSlowing) {

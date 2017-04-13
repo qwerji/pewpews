@@ -5,11 +5,11 @@ function Game() {
     this.projectiles = null
     this.gamePads = null
 
-    let mspf, fpsTimer = new Date().getTime(), fpsInterval
+    this.deltaTime = 0
+    let fpsTimer = new Date().getTime(), fpsInterval
 
     this.gameLoop = () => {
-        this.endFrame()
-        this.startFrame()
+        this.updateClock()
 
         // for (var idx = this.players.length - 1; idx >= 0; idx--) {
         //     this.players[idx].update();
@@ -153,7 +153,7 @@ function Game() {
         player.setup('fat', stage)
         this.players.push(player)
 
-        for (var idx = 0; idx < 30; idx++) {
+        for (var idx = 0; idx < 10; idx++) {
             const obstacle = new Obstacle()
             obstacle.setup('obstacle', stage)
             this.obstacles.push(obstacle)    
@@ -229,17 +229,16 @@ function Game() {
     }
     this.removeProjectile = idx => {
         const deleted = this.projectiles.splice(idx,1)[0]
-        console.log(deleted)
         deleted.sprite.destroy(false)
         stage.removeChild(deleted.sprite)
     }
 
-    this.startFrame = () => {
+    this.updateClock = () => {
+        mspf = new Date().getTime() - fpsTimer
+        this.deltaTime = mspf/1000
         fpsTimer = new Date().getTime()
     }
-    this.endFrame = () => {
-        mspf = new Date().getTime() - fpsTimer
-    }
+
     this.displayfps = () => {
         fpsDisplay.innerHTML = `${(1000/mspf).toFixed(2)}fps`
     }
