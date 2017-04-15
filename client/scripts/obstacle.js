@@ -8,8 +8,9 @@ Obstacle.prototype.setup = function(texture, stage) {
     this.sprite = new PIXI.Sprite(this.texture)
     this.sprite.height = 100
     this.sprite.width = 100
-    this.sprite.x = randomInt(0, window.innerWidth)
-    this.sprite.y = randomInt(0, window.innerHeight)
+    this.sprite.x = randomInt(0, renderer.width)
+    this.sprite.y = randomInt(0, renderer.height)
+    this.sprite.zIndex = 0
 
     stage.addChild(this.sprite)
 }

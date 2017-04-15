@@ -110,6 +110,7 @@ Player.prototype.setup = function(textureName, stage) {
     this.sprite.anchor.set(.5, .5)
     this.sprite.x = renderer.width / 2
     this.sprite.y = renderer.height / 2
+    this.sprite.zIndex = 0
 
     if (this.gamePadIndex === undefined) {
         this.setupKeyboard()
@@ -119,8 +120,7 @@ Player.prototype.setup = function(textureName, stage) {
     this.healthBar.zIndex = 10
 
     this.sprite.addChild(this.healthBar)
-    stage.addChild(this.sprite)
-    stage.addChild(this.healthBar)
+    stage.addChild(this.sprite, this.healthBar)
 }
 
 Player.prototype.getGamePadInfo = function() {
@@ -264,9 +264,6 @@ Player.prototype.updateKeyInput = function() {
 Player.prototype.update = function() {
 
     // Update health bar
-    this.healthBar.text = this.health
-    this.healthBar.x = this.sprite.x - this.healthBar.width / 2
-    this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
 
     if (this.gamePadIndex !== undefined) {
         this.updatePadInput()
@@ -282,6 +279,15 @@ Player.prototype.update = function() {
     }
     if (this.ySlowing) {
         this.vy *= this.easing
+    }
+
+    this.healthBar.text = this.health
+    this.healthBar.x = this.sprite.x - this.healthBar.width / 2
+
+    if (this.sprite.y < 90) {
+        this.healthBar.y = this.sprite.y + this.sprite.halfHeight
+    } else {
+        this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
     }
 
 }

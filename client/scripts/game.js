@@ -25,15 +25,20 @@ function Game() {
                 }
             )
 
-            for (let obstacleIdx = this.obstacles.length - 1; obstacleIdx >= 0; obstacleIdx--) {
+            if (!projectileShouldBeRemoved) {
 
-                const obstacle = this.obstacles[obstacleIdx]
+                for (let obstacleIdx = this.obstacles.length - 1; obstacleIdx >= 0; obstacleIdx--) {
 
-                // Obstacle vs Projectile Collision
-                if (BUMP.hitTestRectangle(obstacle.sprite, projectile.sprite)) {
-                    projectileShouldBeRemoved = true
+                    const obstacle = this.obstacles[obstacleIdx]
+
+                    // Obstacle vs Projectile Collision
+                    if (BUMP.hitTestRectangle(obstacle.sprite, projectile.sprite)) {
+                        projectileShouldBeRemoved = true
+                    }
                 }
+
             }
+
             if (projectileShouldBeRemoved) this.removeProjectile(projectileIdx)
         }
 
@@ -44,11 +49,12 @@ function Game() {
             const player = this.players[idx]
             if (player.isAlive) {
 
+                player.update()
+
                 avgX += player.sprite.x
                 avgY += player.sprite.y
                 living++
 
-                player.update()
                     // Player v bounding frame collisions
                 BUMP.contain(
                         player.sprite, { x: 0, y: 0, width: renderer.width, height: renderer.height },
@@ -94,13 +100,17 @@ function Game() {
                         true
                     )
                 }
+
             } // end of if alive
+            
+
+
         }// end of players loop
 
         avgX /= living
         avgY /= living
 
-        // // Camera Movement
+        // Camera Movement
         // stage.pivot.x = avgX
         // stage.pivot.y = avgY
         // stage.position.x = renderer.width/2;
@@ -111,7 +121,6 @@ function Game() {
     }
 
     this.setup = () => {
-        console.log('Textures Loaded')
 
         this.gamePads = new Gamepad()
         this.gamePads.setup()
@@ -124,13 +133,11 @@ function Game() {
         player.setup('fat', stage)
         this.players.push(player)
 
-        for (var idx = 0; idx < 10; idx++) {
+        for (var idx = 0; idx < 5; idx++) {
             const obstacle = new Obstacle()
             obstacle.setup('obstacle', stage)
             this.obstacles.push(obstacle)
         }
-
-        renderer.render(stage)
 
         fpsInterval = setInterval(this.displayfps, 200)
 

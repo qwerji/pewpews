@@ -1,7 +1,15 @@
+PIXI.utils.skipHello()
+console.log('Powered by Pixi.js + Bump')
+console.log('Devs: punkty, qwerji')
+
 //Create the renderer
 var renderer = PIXI.autoDetectRenderer(
     800, 600,
-    {antialias: true}
+    {
+        antialias: true, 
+        transparent: false, 
+        backgroundColor: 0x000000
+    }
 );
 
 //Add the canvas to the HTML document
@@ -9,6 +17,12 @@ document.body.appendChild(renderer.view);
 
 //Create a container object called the `stage`
 var stage = new PIXI.Container();
+var bounds = new PIXI.Graphics();
+bounds.beginFill(0x323232);
+bounds.drawRect(0, 0, renderer.width, renderer.height);
+bounds.endFill();
+bounds.zIndex = -1
+stage.addChild(bounds)
 //Tell the `renderer` to `render` the `stage`
 
 

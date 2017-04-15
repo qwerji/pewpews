@@ -29,10 +29,13 @@ Projectile.prototype.setup = function(direction, textureName, stage, source) {
     this.sprite.x = originSprite.x
     this.sprite.y = originSprite.y
     this.sprite.anchor.set(.5, .5)
+    this.sprite.zIndex = 10
 
 
     switch (direction) {
         case "up":
+            console.log()
+            this.sprite.x -= this.sprite.width/3
             this.sprite.y -= originSprite.halfHeight
             this.vy = -this.speed
             break;
