@@ -39,10 +39,11 @@ function Player(gamePadIndex) {
         this.isAlive = false
         this.sprite.x = 100000
         this.sprite.y = 100000
-
+        this.healthBar.x = this.sprite.x - this.healthBar.width/2
+        this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
         const respawnTimer = setTimeout(function() {
-            this.sprite.x = randomInt(0, window.innerWidth)
-            this.sprite.y = randomInt(0, window.innerHeight)
+            this.sprite.x = randomInt(0, renderer.width)
+            this.sprite.y = randomInt(0, renderer.height)
             this.isAlive = true
             this.health = 100
             clearTimeout(respawnTimer)
@@ -195,8 +196,8 @@ function Player(gamePadIndex) {
         this.sprite.height = 100
         this.sprite.width = 100
         this.sprite.anchor.set(.5, .5)
-        this.sprite.x = window.innerWidth/2 - this.sprite.width/2
-        this.sprite.y = window.innerHeight/2 - this.sprite.height/2
+        this.sprite.x = renderer.width/2 - this.sprite.width/2
+        this.sprite.y = renderer.height/2 - this.sprite.height/2
         
         if (this.gamePadIndex === undefined) {
             this.setupKeyboard()
@@ -288,8 +289,6 @@ function Player(gamePadIndex) {
         // console.log(this.healthBar)
         this.healthBar.x = this.sprite.x - this.healthBar.width/2
         this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
-
-        if (!this.isAlive) return
 
         if (this.gamePadIndex !== undefined) {
             this.updatePadInput()
