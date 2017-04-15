@@ -8919,6 +8919,7 @@ var Container = function (_DisplayObject) {
             child.transform._parentID = -1;
 
             this.children.push(child);
+            this.sortByZ()
 
             // ensure bounds will be recalculated
             this._boundsID++;
@@ -8929,6 +8930,14 @@ var Container = function (_DisplayObject) {
         }
 
         return child;
+    };
+
+    Container.prototype.sortByZ = function sortByZ() {
+        this.children.sort(function(a,b) {
+            if (a.zIndex < b.zIndex) return -1;
+            if (a.zIndex > b.zIndex) return 1;
+            return 0;
+        })
     };
 
     /**

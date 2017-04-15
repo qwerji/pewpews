@@ -28,5 +28,3 @@ PIXI.loader
     .add('4', 'images/sprites/projectiles/projectile_4.png')
     .add('5', 'images/sprites/projectiles/projectile_5.png')
     .load(game.setup)
-
-PIXI.Sprite.prototype.zIndex = 0

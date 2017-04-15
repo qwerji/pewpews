@@ -1,309 +1,287 @@
 function Player(gamePadIndex) {
     
-    this.texture = null
     this.sprite = null
+    this.healthBar = null
+    
     this.gamePadIndex = gamePadIndex
+    this.keys = {}
+
+    // THE DREAM LIVES ON
+    // #ONEDAY
     this.socket = {
         id:1
     }
-
-    this.health = 100
-    this.healthBar = null
 
     //Movement
     this.vx = 0
     this.vy = 0
     this.speed = 250
-    this.easing = 0.85
+    this.easing = 0.75
 
     //Shooting
-    this.rateOfFire = 100
+    this.rateOfFire = 300
     this.canFire = true
+    this.shootTimer = null
 
+    this.health = 100
     this.isAlive = true
     this.respawnTime = 5000
 
-    let shootTimer = null
-    
-    this.takeDamage = source => {
-        this.health -= source.damage
-        
-        if (this.health <= 0) {
-            this.die()
-        }
+}
 
+Player.prototype.takeDamage = function(source) {
+    this.health -= source.damage
+    if (this.health <= 0) {
+        this.die()
     }
+}
 
-    this.die = () => {
+Player.prototype.die = function() {
 
-        this.isAlive = false
-        this.sprite.x = 100000
-        this.sprite.y = 100000
-        this.healthBar.x = this.sprite.x - this.healthBar.width/2
-        this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
-        const respawnTimer = setTimeout(function() {
-            this.sprite.x = randomInt(0, renderer.width)
-            this.sprite.y = randomInt(0, renderer.height)
-            this.isAlive = true
-            this.health = 100
-            clearTimeout(respawnTimer)
-        }.bind(this), this.respawnTime)
+    this.isAlive = false
+    this.sprite.x = 100000
+    this.sprite.y = 100000
+    this.healthBar.x = this.sprite.x - this.healthBar.width / 2
+    this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
+    const respawnTimer = setTimeout(function() {
+        this.sprite.x = randomInt(0, renderer.width)
+        this.sprite.y = randomInt(0, renderer.height)
+        this.isAlive = true
+        this.health = 100
+        clearTimeout(respawnTimer)
+    }.bind(this), this.respawnTime)
 
-    }
+}
 
-    this.fire = (direction, texture) => {
+Player.prototype.fire = function(direction) {
+
+    // Checks if player can fire
+    if (this.canFire) {
+        // Creates a projectile from the desired direction and texture
         const projectile = new Projectile()
-        projectile.setup(direction, texture, stage, this)
+        projectile.setup(direction, 1, stage, this)
         game.projectiles.push(projectile)
+            // Sets a delay on the rate projectiles are fired
+        this.coolDown()
+    }
+    // Clears any existing timer
+    clearInterval(this.shootTimer)
+        // Repeated fire interval
+    this.shootTimer = setInterval(function() {
+        this.fire(direction)
+    }.bind(this), this.rateOfFire)
+
+}
+
+Player.prototype.ceaseFire = function() {
+    clearInterval(this.shootTimer)
+}
+
+Player.prototype.setupKeyboard = function() {
+
+    const keys = this.keys
+
+    keys.W = keyboard(87)
+    keys.A = keyboard(65)
+    keys.S = keyboard(83)
+    keys.D = keyboard(68)
+    keys.Up = keyboard(38)
+    keys.Left = keyboard(37)
+    keys.Right = keyboard(39)
+    keys.Down = keyboard(40)
+
+}
+
+Player.prototype.coolDown = function() {
+    this.canFire = false
+    setTimeout(function() {
+        this.canFire = true
+    }.bind(this), this.rateOfFire)
+}
+
+Player.prototype.setup = function(textureName, stage) {
+
+    this.sprite = new PIXI.Sprite(
+        PIXI.loader.resources[textureName].texture
+    )
+
+    this.sprite.height = 100
+    this.sprite.width = 100
+    this.sprite.anchor.set(.5, .5)
+    this.sprite.x = renderer.width / 2
+    this.sprite.y = renderer.height / 2
+
+    if (this.gamePadIndex === undefined) {
+        this.setupKeyboard()
     }
 
-    this.fireUp = () => {
-        // Checks if player can fire
-        if (this.canFire) {
-            // Creates a projectile from the desired direction and texture
-            this.fire("up", randomInt(0,5))
-                // Sets a delay on the rate projectiles are fired
-            this.coolDown()
-        }
-        // Clears any existing timer
-        clearInterval(shootTimer)
-            // Repeated fire interval
-        shootTimer = setInterval(function() {
-            this.fire("up", randomInt(0,5))
-        }, this.rateOfFire)
-    }
+    this.healthBar = new PIXI.Text(`${this.health}`, game.constants.healthBarTextStyle);
+    this.healthBar.zIndex = 10
 
-    this.fireRight = () => {
-        if(this.canFire){
-            this.fire("right", randomInt(0,5))
-            this.coolDown()
-        }
-        clearInterval(shootTimer)
-        shootTimer = setInterval(function(){
-            this.fire("right", randomInt(0,5))       
-        },this.rateOfFire)
-    }
+    this.sprite.addChild(this.healthBar)
+    stage.addChild(this.sprite)
+    stage.addChild(this.healthBar)
+}
 
-    this.fireDown = () => {
-        if (this.canFire) {
-            this.fire("down", randomInt(0,5))
-            this.coolDown()
-        }
-        clearInterval(shootTimer)
-        shootTimer = setInterval(function() {
-            this.fire("down", randomInt(0,5))
-        },this.rateOfFire)
-    }
+Player.prototype.getGamePadInfo = function() {
+    return game.gamePads.getGamepadInfo(this.gamePadIndex)
+}
 
-    this.fireLeft = () => {
-        if(this.canFire){
-            this.fire("left", randomInt(0,5))
-            this.coolDown()
-        }
-        clearInterval(shootTimer)
-        shootTimer = setInterval(function(){
-            this.fire("left", randomInt(0,5))
-        },this.rateOfFire)
-    }
+Player.prototype.updatePadInput = function() {
+    const gpState = this.getGamePadInfo()
 
-    this.ceaseFire = () => {
-        clearInterval(shootTimer)
-    }
+    // Xbox Controller
 
-    this.setupKeyboard = () => {
-        const W = keyboard(87),
-            A = keyboard(65),
-            S = keyboard(83),
-            D = keyboard(68),
-            Up = keyboard(38),
-            Left = keyboard(37),
-            Right = keyboard(39),
-            Down = keyboard(40)
-        
-        W.press = () => {
-            this.vy = -this.speed
-            this.ySlowing = false
-        }
-        W.release = () => {
-            if (!S.isDown) {
-                this.ySlowing = true
-            } else {
-                this.vy = this.speed
-            }
-        }
-
-        A.press = () => {
-            this.vx = -this.speed
-            this.xSlowing = false
-        }
-        A.release = () => {
-            if (!D.isDown) {
-                this.xSlowing = true
-            } else {
-                this.vx = this.speed
-            }
-        }
-
-        S.press = () => {
-            this.vy = this.speed
-            this.ySlowing = false
-        }
-        S.release = () => {
-            if (!W.isDown) {
-                this.ySlowing = true
-            } else {
-                this.vy = -this.speed
-            }
-        }
-
-        D.press = () => {
-            this.vx = this.speed
-            this.xSlowing = false
-        }
-        D.release = () => {
-            if (!A.isDown) {
-                this.xSlowing = true
-            } else {
-                this.vx = -this.speed
-            }
-        }
-        // Shooting Controls
-
-        // Shoots Up
-        Up.press = this.fireUp
-        // Stops shooting on button release
-        Up.release = this.ceaseFire
-        Left.press = this.fireLeft
-        Left.release = this.ceaseFire
-        Right.press = this.fireRight
-        Right.release = this.ceaseFire
-        Down.press = this.fireDown
-        Down.release = this.ceaseFire
-    }
-
-    this.coolDown = () => {
-        this.canFire = false
-        const _this = this
-        setTimeout(function(){
-            _this.canFire = true
-        },this.rateOfFire)
-    }
-
-    this.setup = (texture, stage) => {
-        this.texture = PIXI.loader.resources[texture].texture
-        this.sprite = new PIXI.Sprite(this.texture)
-
-        this.sprite.height = 100
-        this.sprite.width = 100
-        this.sprite.anchor.set(.5, .5)
-        this.sprite.x = renderer.width/2 - this.sprite.width/2
-        this.sprite.y = renderer.height/2 - this.sprite.height/2
-        
-        if (this.gamePadIndex === undefined) {
-            this.setupKeyboard()
-        }
-
-        this.healthBar = new PIXI.Text(`${this.health}`, game.constants.healthBarTextStyle);
-        this.healthBar.zIndex = 10
-
-        this.sprite.addChild(this.healthBar)
-        stage.addChild(this.sprite)
-        stage.addChild(this.healthBar)
-    }
-
-    this.updatePadInput = () => {
-        const gpState = this.getGamePadInfo()
-
-        // Xbox Controller
-
-        // Movement
-        const axes = gpState.axes, sensitivity = 0.3
+    // Movement
+    const axes = gpState.axes,
+        sensitivity = 0.3
         // UP
-        if (axes[1] <= -sensitivity) {
-            this.vy = -this.speed
-        } else {
-            this.ySlowing = true
-        }
-
-        // RIGHT
-        if (axes[0] >= sensitivity) {
-            this.vx = this.speed
-        } else {
-            this.xSlowing = true
-        }
-
-        // DOWN
-        if (axes[1] >= sensitivity) {
-            this.vy = this.speed
-        } else {
-            this.ySlowing = true
-        }
-
-        // LEFT
-        if (axes[0] <= -sensitivity) {
-            this.vx = -this.speed
-        } else {
-            this.xSlowing = true
-        }
-
-        // Firing
-
-        const buttons = gpState.buttons
-
-        // UP
-        if (buttons[3].pressed) {
-            this.fireUp()
-        } else {
-            this.ceaseFire()
-        }
-
-        // RIGHT
-        if (buttons[1].pressed) {
-            this.fireRight()
-        } else {
-            this.ceaseFire()
-        }
-
-        // DOWN
-        if (buttons[0].pressed) {
-            this.fireDown()
-        } else {
-            this.ceaseFire()
-        }
-
-        // LEFT
-        if (buttons[2].pressed) {
-            this.fireLeft()
-        } else {
-            this.ceaseFire()
-        }
+    if (axes[1] <= -sensitivity) {
+        this.vy = -this.speed
+    } else {
+        this.ySlowing = true
     }
 
-    this.getGamePadInfo = () => {
-        return game.gamePads.getGamepadInfo(this.gamePadIndex)
+    // RIGHT
+    if (axes[0] >= sensitivity) {
+        this.vx = this.speed
+    } else {
+        this.xSlowing = true
     }
 
-    this.update = () => {
-        // Update health bar position
-        this.healthBar.text = `${this.health}`
-        // console.log(this.healthBar)
-        this.healthBar.x = this.sprite.x - this.healthBar.width/2
-        this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
+    // DOWN
+    if (axes[1] >= sensitivity) {
+        this.vy = this.speed
+    } else {
+        this.ySlowing = true
+    }
 
-        if (this.gamePadIndex !== undefined) {
-            this.updatePadInput()
-        }
+    // LEFT
+    if (axes[0] <= -sensitivity) {
+        this.vx = -this.speed
+    } else {
+        this.xSlowing = true
+    }
 
-        this.sprite.x += this.vx * game.deltaTime
-        this.sprite.y += this.vy * game.deltaTime
+    // Firing
 
-        if (this.xSlowing) {
-            this.vx *= this.easing
-        }
-        if (this.ySlowing) {
-            this.vy *= this.easing
-        }
+    const buttons = gpState.buttons
 
+    // UP
+    if (buttons[3].pressed) {
+        this.fire("up")
+    } else {
+        this.ceaseFire()
+    }
+
+    // RIGHT
+    if (buttons[1].pressed) {
+        this.fire("right")
+    } else {
+        this.ceaseFire()
+    }
+
+    // DOWN
+    if (buttons[0].pressed) {
+        this.fire("down")
+    } else {
+        this.ceaseFire()
+    }
+
+    // LEFT
+    if (buttons[2].pressed) {
+        this.fire("left")
+    } else {
+        this.ceaseFire()
+    }
+}
+
+Player.prototype.updateKeyInput = function() {
+
+    const keys = this.keys
+
+    // Movement
+
+    // UP
+    if (keys.W.isDown) {
+        this.vy = -this.speed
+    } else {
+        this.ySlowing = true
+    }
+
+    // RIGHT
+    if (keys.D.isDown) {
+        this.vx = this.speed
+    } else {
+        this.xSlowing = true
+    }
+
+    // DOWN
+    if (keys.S.isDown) {
+        this.vy = this.speed
+    } else {
+        this.ySlowing = true
+    }
+
+    // LEFT
+    if (keys.A.isDown) {
+        this.vx = -this.speed
+    } else {
+        this.xSlowing = true
+    }
+
+    // Firing
+
+    // UP
+    if (keys.Up.isDown) {
+        this.fire("up")
+    } else {
+        this.ceaseFire()
+    }
+
+    // RIGHT
+    if (keys.Right.isDown) {
+        this.fire("right")
+    } else {
+        this.ceaseFire()
+    }
+
+    // DOWN
+    if (keys.Down.isDown) {
+        this.fire("down")
+    } else {
+        this.ceaseFire()
+    }
+
+    // LEFT
+    if (keys.Left.isDown) {
+        this.fire("left")
+    } else {
+        this.ceaseFire()
+    }
+}
+
+Player.prototype.update = function() {
+
+    // Update health bar
+    this.healthBar.text = this.health
+    this.healthBar.x = this.sprite.x - this.healthBar.width / 2
+    this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
+
+    if (this.gamePadIndex !== undefined) {
+        this.updatePadInput()
+    } else {
+        this.updateKeyInput()
+    }
+
+    this.sprite.x += this.vx * game.deltaTime
+    this.sprite.y += this.vy * game.deltaTime
+
+    if (this.xSlowing) {
+        this.vx *= this.easing
+    }
+    if (this.ySlowing) {
+        this.vy *= this.easing
     }
 
 }
