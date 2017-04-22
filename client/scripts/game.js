@@ -18,7 +18,7 @@ function Game() {
             projectile.update()
                 // Projectile vs Wall Collision
             BUMP.contain(
-                projectile.sprite, { x: 0, y: 0, width: renderer.width, height: renderer.height },
+                projectile.sprite, { x: 100, y: 100, width: renderer.width - 100, height: renderer.height - 100 },
                 true,
                 hit => {
                     projectileShouldBeRemoved = true
@@ -57,7 +57,7 @@ function Game() {
 
                     // Player v bounding frame collisions
                 BUMP.contain(
-                        player.sprite, { x: 0, y: 0, width: renderer.width, height: renderer.height },
+                        player.sprite, { x: 100, y: 100, width: renderer.width-100, height: renderer.height-100 },
                         true,
                         hit => {
                             // console.log(hit)
@@ -102,8 +102,6 @@ function Game() {
                 }
 
             } // end of if alive
-            
-
 
         }// end of players loop
 
@@ -113,8 +111,8 @@ function Game() {
         // Camera Movement
         // stage.pivot.x = avgX
         // stage.pivot.y = avgY
-        // stage.position.x = renderer.width/2;
-        // stage.position.y = renderer.height/2;
+        // stage.position.x = renderer.width/2
+        // stage.position.y = renderer.height/2
 
         renderer.render(stage)
         requestAnimationFrame(this.gameLoop)
@@ -133,11 +131,12 @@ function Game() {
         player.setup('fat', stage)
         this.players.push(player)
 
-        for (var idx = 0; idx < 5; idx++) {
-            const obstacle = new Obstacle()
-            obstacle.setup('obstacle', stage)
-            this.obstacles.push(obstacle)
-        }
+        this.generateLevel('easy')
+
+        ;(new Wall()).setup('wall', 'top', stage)
+        ;(new Wall()).setup('wall', 'right', stage)
+        ;(new Wall()).setup('wall', 'bottom', stage)
+        ;(new Wall()).setup('wall', 'left', stage)
 
         fpsInterval = setInterval(this.displayfps, 200)
 
@@ -219,6 +218,24 @@ function Game() {
 
     this.displayfps = () => {
         fpsDisplay.innerHTML = `${(1000/mspf).toFixed(2)}fps`
+    }
+
+    this.generateLevel = levelName => {
+        const level = Levels[levelName].level
+        for (let i = 0; i < level.length; i++) {
+            const row = level[i]
+            for (let j = 0; j < row.length; j++) {
+                if (row[j] === 1) {
+                    const obstacle = new Obstacle()
+                    obstacle.setup(
+                        'obstacle',
+                        { x: (j + row[j]) * 100, y: (i + row[j]) * 100 },
+                        stage
+                    )
+                    this.obstacles.push(obstacle)
+                }
+            }
+        }
     }
 
     this.constants = {

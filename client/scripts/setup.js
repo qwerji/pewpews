@@ -1,10 +1,11 @@
 PIXI.utils.skipHello()
 console.log('Powered by Pixi.js + Bump')
 console.log('Devs: punkty, qwerji')
+console.log('%c 🐌', 'font-size: 40px;')
 
 //Create the renderer
 var renderer = PIXI.autoDetectRenderer(
-    800, 600,
+    1600, 1000,
     {
         antialias: true, 
         transparent: false, 
@@ -23,18 +24,19 @@ bounds.drawRect(0, 0, renderer.width, renderer.height);
 bounds.endFill();
 bounds.zIndex = -1
 stage.addChild(bounds)
-//Tell the `renderer` to `render` the `stage`
-
 
 // Initialize Collision Library
 const BUMP = new Bump()
 
 const game = new Game()
-const fpsDisplay = document.getElementById('fpsDisplay')
+const fpsDisplay = document.createElement('P')
+fpsDisplay.id = 'fpsDisplay'
+document.body.appendChild(fpsDisplay)
 
 PIXI.loader
     .add('fat', 'images/sprites/players/fat.png')
     .add('obstacle', 'images/sprites/terrain/obstacle.png')
+    .add('wall', 'images/sprites/terrain/wall.png')
     .add('0', 'images/sprites/projectiles/projectile_0.png')
     .add('1', 'images/sprites/projectiles/projectile_1.png')
     .add('2', 'images/sprites/projectiles/projectile_2.png')

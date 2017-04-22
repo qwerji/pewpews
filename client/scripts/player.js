@@ -105,8 +105,8 @@ Player.prototype.setup = function(textureName, stage) {
         PIXI.loader.resources[textureName].texture
     )
 
-    this.sprite.height = 100
-    this.sprite.width = 100
+    this.sprite.height = 50
+    this.sprite.width = 50
     this.sprite.anchor.set(.5, .5)
     this.sprite.x = renderer.width / 2
     this.sprite.y = renderer.height / 2

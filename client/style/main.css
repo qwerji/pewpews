@@ -3,9 +3,28 @@
     padding: 0;
 }
 
+body {
+    background: black;
+}
+
 p#fpsDisplay {
     font-family: sans-serif;
     position: fixed;
     color: white;
+    background: rgba(0,0,0,0.5);
     z-index: 5;
+}
+
+canvas {
+    width: 100vw; 
+    height: 62.5vw; /* height:width ratio = 10/16 = .625  */
+    background: pink;
+    max-height: 100vh;
+    max-width: 160vh; /* 16/10 = 1.6 */
+    margin: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
