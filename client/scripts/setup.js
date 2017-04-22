@@ -34,7 +34,7 @@ fpsDisplay.id = 'fpsDisplay'
 document.body.appendChild(fpsDisplay)
 
 PIXI.loader
-    .add('fat', 'images/sprites/players/fat.png')
+    .add('fat', 'images/sprites/players/cowbro.png')
     .add('obstacle', 'images/sprites/terrain/obstacle.png')
     .add('wall', 'images/sprites/terrain/wall.png')
     .add('0', 'images/sprites/projectiles/projectile_0.png')
