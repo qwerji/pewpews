@@ -1,13 +1,13 @@
 function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function toRadians(angle) {
-  return angle * (Math.PI / 180);
+    return angle * (Math.PI / 180);
 }
 
 function generateLevelFromImage(src, cb) {
-  // Ben wrote this
+    // Ben wrote this
     const image = new Image()
     image.src = src
     const canvas = document.createElement('CANVAS')

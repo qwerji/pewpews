@@ -11,6 +11,24 @@ function Game() {
 
     this.gameLoop = () => {
         this.updateClock()
+
+        for (let obstacleIdx = this.obstacles.length - 1; obstacleIdx >= 0; obstacleIdx--) {
+            const obstacle = this.obstacles[obstacleIdx]
+            if (BUMP.hitTestRectangle(this.sword.sprite, obstacle.sprite) && (this.sword.carrier && !this.sword.carrier.sword)) {
+                this.sword.drop()
+            }
+        }
+        if (this.sword.carrier && !this.sword.carrier.sword) {
+            BUMP.contain(
+                this.sword.sprite, { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 },
+                false,
+                hit => {
+                    this.sword.drop()
+                }
+            )
+        }
+
+        this.sword.update()
             // Projectile update Loop
         for (let projectileIdx = this.projectiles.length - 1; projectileIdx >= 0; projectileIdx--) {
             const projectile = this.projectiles[projectileIdx]
@@ -42,7 +60,9 @@ function Game() {
             if (projectileShouldBeRemoved) this.removeProjectile(projectileIdx)
         }
 
-        let avgX = 0, avgY = 0, living = 0
+        let avgX = 0,
+            avgY = 0,
+            living = 0
 
         // Loop through players
         for (let idx = this.players.length - 1; idx >= 0; idx--) {
@@ -55,9 +75,9 @@ function Game() {
                 avgY += player.sprite.y
                 living++
 
-                    // Player v wall 
+                // Player v wall 
                 BUMP.contain(
-                        player.sprite, { x: 50, y: 50, width: renderer.width-50, height: renderer.height-50 },
+                        player.sprite, { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 },
                         true,
                         hit => {
                             // console.log(hit)
@@ -100,41 +120,20 @@ function Game() {
                         true
                     )
                 }
-                if(BUMP.hitTestRectangle(this.sword.sprite, player.sprite)) {
-                    // if(!(player.sword || this.sword.carrier === player)){
-                    //     this.sword.equippedBy(player)
-                    //     player.getSword(this.sword)    
-                    // } else if(!(player.sword) && (this.sword.carrier === player)) {
-                    //     player.takeDamage(this.sword)
-                    // }
-                    if(!this.sword.carrier){
+                if (BUMP.hitTestRectangle(this.sword.sprite, player.sprite)) {
+                    if (!this.sword.carrier) {
                         this.sword.equippedBy(player)
                         player.getSword(this.sword)
-                    } else if(!player.sword 
-                    && !(this.sword.carrier === player)
-                    && (Math.abs(this.sword.vy) > 0 || Math.abs(this.sword.vx) > 0)){
+                    } else if (!player.sword && !(this.sword.carrier === player) && (Math.abs(this.sword.vy) > 0 || Math.abs(this.sword.vx) > 0)) {
                         player.takeDamage(this.sword)
                     }
                 }
             } // end of if alive
 
-        }// end of players loop
-        // Sword Collisions with walls and obstacles
-        for (let obstacleIdx = this.obstacles.length - 1; obstacleIdx >= 0; obstacleIdx--) {
-            const obstacle = this.obstacles[obstacleIdx]
-            if(BUMP.hitTestRectangle(this.sword.sprite,obstacle.sprite)) {
-                this.sword.drop()
-            }
-        }
-         BUMP.contain(
-            this.sword.sprite, { x: 50, y: 50, width: renderer.width-50, height: renderer.height-50 },
-            true,
-            hit => {
-                this.sword.drop()
-            }
-        )
+        } // end of players loop
 
-        this.sword.update()
+        // Sword Collisions with walls and obstacles
+        
         avgX /= living
         avgY /= living
 
@@ -160,13 +159,13 @@ function Game() {
         const player = new Player()
         player.setup('fat', stage)
         this.players.push(player)
-        generateLevelFromImage('../images/levels/cornelius.png',this.generateLevel)
+        generateLevelFromImage('../images/levels/cornelius.png', this.generateLevel)
         this.sword = new Sword()
-        this.sword.setup({x:renderer.width/2, y:renderer.height/2},"6",stage)
-        ;(new Wall()).setup('wall', 'top', stage)
-        ;(new Wall()).setup('wall', 'right', stage)
-        ;(new Wall()).setup('wall', 'bottom', stage)
-        ;(new Wall()).setup('wall', 'left', stage)
+        this.sword.setup({ x: renderer.width / 2, y: renderer.height / 2 }, "6", stage);
+        (new Wall()).setup('wall', 'top', stage);
+        (new Wall()).setup('wall', 'right', stage);
+        (new Wall()).setup('wall', 'bottom', stage);
+        (new Wall()).setup('wall', 'left', stage)
 
         fpsInterval = setInterval(this.displayfps, 200)
 
@@ -257,15 +256,13 @@ function Game() {
                 if (row[j].a === 255) {
                     const obstacle = new Obstacle()
                     obstacle.setup(
-                        'obstacle',
-                        { x: (j + 1) * 50, y: (i + 1) * 50 },
+                        'obstacle', { x: (j + 1) * 50, y: (i + 1) * 50 },
                         stage
                     )
                     this.obstacles.push(obstacle)
-                }   
+                }
             }
         }
-
     }
 
     this.constants = {

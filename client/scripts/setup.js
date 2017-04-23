@@ -44,4 +44,5 @@ PIXI.loader
     .add('4', 'images/sprites/projectiles/projectile_4.png')
     .add('5', 'images/sprites/projectiles/projectile_5.png')
     .add('6', 'images/sprites/projectiles/projectile_6.png')
+    .add('6h', 'images/sprites/projectiles/projectile_6h.png')
     .load(game.setup)

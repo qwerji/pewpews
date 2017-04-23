@@ -265,14 +265,14 @@ Player.prototype.updateKeyInput = function() {
         this.ceaseFire()
     }
 }
-Player.prototype.getSword = function(sword){
+Player.prototype.getSword = function(sword) {
     this.sword = sword
-    this.sword.sprite.rotation = toRadians(0)
+    this.sword.setSprite('up')
 }
 Player.prototype.update = function() {
     if(this.sword){
-        this.sword.sprite.x = this.sprite.x + 40
-        this.sword.sprite.y = this.sprite.y - 30
+        this.sword.sprite.x = this.sprite.x + this.sword.xOff
+        this.sword.sprite.y = this.sprite.y + this.sword.yOff
     }
     // Update health bar
 
