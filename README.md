@@ -4,10 +4,6 @@
 |  _|___|_____|  |  _|___|_____|___|
 |_|              |_|                
 ```
-<<<<<<< HEAD
-=======
-
->>>>>>> b9a2c75c4a3f08fe41ac5679b2ec01fab7183cda
 A local multi-player 2D pewpew game
 
 ## Installation
