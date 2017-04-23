@@ -1,5 +1,9 @@
-# pewpews
-
+```bash
+ ___ ___ _ _ _    ___ ___ _ _ _ ___ 
+| . | -_| | | |  | . | -_| | | |_ -|
+|  _|___|_____|  |  _|___|_____|___|
+|_|              |_|                
+```
 A local multi-player 2D pewpew game
 
 ## Installation

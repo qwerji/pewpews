@@ -34,7 +34,6 @@ Projectile.prototype.setup = function(direction, textureName, stage, source) {
 
     switch (direction) {
         case "up":
-            console.log()
             this.sprite.x -= this.sprite.width/3
             this.sprite.y -= originSprite.halfHeight
             this.vy = -this.speed

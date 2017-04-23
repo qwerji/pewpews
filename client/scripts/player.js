@@ -2,7 +2,7 @@ function Player(gamePadIndex) {
     
     this.sprite = null
     this.healthBar = null
-    
+    this.sword = null    
     this.gamePadIndex = gamePadIndex
     this.keys = {}
 
@@ -54,23 +54,28 @@ Player.prototype.die = function() {
 }
 
 Player.prototype.fire = function(direction) {
-
-    // Checks if player can fire
-    if (this.canFire) {
-        // Creates a projectile from the desired direction and texture
-        const projectile = new Projectile()
-        projectile.setup(direction, 1, stage, this)
-        game.projectiles.push(projectile)
-            // Sets a delay on the rate projectiles are fired
-        this.coolDown()
+    if(this.sword){
+        if (this.canFire) {
+            this.sword.throw(direction)
+            this.coolDown()
+        }
+    } else {
+        // Checks if player can fire
+        if (this.canFire) {
+            // Creates a projectile from the desired direction and texture
+            const projectile = new Projectile()
+            projectile.setup(direction, 1, stage, this)
+            game.projectiles.push(projectile)
+                // Sets a delay on the rate projectiles are fired
+                this.coolDown()
+        }
     }
-    // Clears any existing timer
-    clearInterval(this.shootTimer)
-        // Repeated fire interval
-    this.shootTimer = setInterval(function() {
-        this.fire(direction)
-    }.bind(this), this.rateOfFire)
-
+        // Clears any existing timer
+        clearInterval(this.shootTimer)
+            // Repeated fire interval
+        this.shootTimer = setInterval(function() {
+            this.fire(direction)
+        }.bind(this), this.rateOfFire)
 }
 
 Player.prototype.ceaseFire = function() {
@@ -105,8 +110,8 @@ Player.prototype.setup = function(textureName, stage) {
         PIXI.loader.resources[textureName].texture
     )
 
-    this.sprite.height = 50
-    this.sprite.width = 50
+    this.sprite.height = 100
+    this.sprite.width = 100
     this.sprite.anchor.set(.5, .5)
     this.sprite.x = renderer.width / 2
     this.sprite.y = renderer.height / 2
@@ -260,9 +265,15 @@ Player.prototype.updateKeyInput = function() {
         this.ceaseFire()
     }
 }
-
+Player.prototype.getSword = function(sword){
+    this.sword = sword
+    this.sword.sprite.rotation = toRadians(0)
+}
 Player.prototype.update = function() {
-
+    if(this.sword){
+        this.sword.sprite.x = this.sprite.x + 40
+        this.sword.sprite.y = this.sprite.y - 30
+    }
     // Update health bar
 
     if (this.gamePadIndex !== undefined) {

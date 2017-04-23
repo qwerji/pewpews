@@ -4,7 +4,7 @@ function Game() {
     this.obstacles = null
     this.projectiles = null
     this.gamePads = null
-
+    this.sword = null
     this.deltaTime = 0
     let fpsTimer = new Date().getTime(),
         fpsInterval
@@ -18,7 +18,7 @@ function Game() {
             projectile.update()
                 // Projectile vs Wall Collision
             BUMP.contain(
-                projectile.sprite, { x: 100, y: 100, width: renderer.width - 100, height: renderer.height - 100 },
+                projectile.sprite, { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 },
                 true,
                 hit => {
                     projectileShouldBeRemoved = true
@@ -55,9 +55,9 @@ function Game() {
                 avgY += player.sprite.y
                 living++
 
-                    // Player v bounding frame collisions
+                    // Player v wall 
                 BUMP.contain(
-                        player.sprite, { x: 100, y: 100, width: renderer.width-100, height: renderer.height-100 },
+                        player.sprite, { x: 50, y: 50, width: renderer.width-50, height: renderer.height-50 },
                         true,
                         hit => {
                             // console.log(hit)
@@ -100,11 +100,41 @@ function Game() {
                         true
                     )
                 }
-
+                if(BUMP.hitTestRectangle(this.sword.sprite, player.sprite)) {
+                    // if(!(player.sword || this.sword.carrier === player)){
+                    //     this.sword.equippedBy(player)
+                    //     player.getSword(this.sword)    
+                    // } else if(!(player.sword) && (this.sword.carrier === player)) {
+                    //     player.takeDamage(this.sword)
+                    // }
+                    if(!this.sword.carrier){
+                        this.sword.equippedBy(player)
+                        player.getSword(this.sword)
+                    } else if(!player.sword 
+                    && !(this.sword.carrier === player)
+                    && (Math.abs(this.sword.vy) > 0 || Math.abs(this.sword.vx) > 0)){
+                        player.takeDamage(this.sword)
+                    }
+                }
             } // end of if alive
 
         }// end of players loop
+        // Sword Collisions with walls and obstacles
+        for (let obstacleIdx = this.obstacles.length - 1; obstacleIdx >= 0; obstacleIdx--) {
+            const obstacle = this.obstacles[obstacleIdx]
+            if(BUMP.hitTestRectangle(this.sword.sprite,obstacle.sprite)) {
+                this.sword.drop()
+            }
+        }
+         BUMP.contain(
+            this.sword.sprite, { x: 50, y: 50, width: renderer.width-50, height: renderer.height-50 },
+            true,
+            hit => {
+                this.sword.drop()
+            }
+        )
 
+        this.sword.update()
         avgX /= living
         avgY /= living
 
@@ -130,9 +160,9 @@ function Game() {
         const player = new Player()
         player.setup('fat', stage)
         this.players.push(player)
-
-        this.generateLevel('easy')
-
+        generateLevelFromImage('../images/levels/cornelius.png',this.generateLevel)
+        this.sword = new Sword()
+        this.sword.setup({x:renderer.width/2, y:renderer.height/2},"6",stage)
         ;(new Wall()).setup('wall', 'top', stage)
         ;(new Wall()).setup('wall', 'right', stage)
         ;(new Wall()).setup('wall', 'bottom', stage)
@@ -220,22 +250,22 @@ function Game() {
         fpsDisplay.innerHTML = `${(1000/mspf).toFixed(2)}fps`
     }
 
-    this.generateLevel = levelName => {
-        const level = Levels[levelName].level
+    this.generateLevel = level => {
         for (let i = 0; i < level.length; i++) {
             const row = level[i]
             for (let j = 0; j < row.length; j++) {
-                if (row[j] === 1) {
+                if (row[j].a === 255) {
                     const obstacle = new Obstacle()
                     obstacle.setup(
                         'obstacle',
-                        { x: (j + row[j]) * 100, y: (i + row[j]) * 100 },
+                        { x: (j + 1) * 50, y: (i + 1) * 50 },
                         stage
                     )
                     this.obstacles.push(obstacle)
-                }
+                }   
             }
         }
+
     }
 
     this.constants = {
