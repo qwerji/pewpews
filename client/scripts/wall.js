@@ -8,28 +8,30 @@ Wall.prototype.setup = function(texture, type, stage) {
         PIXI.loader.resources[texture].texture
     )
 
-    this.sprite.zIndex = 0
-
     switch (type) {
         case 'left':
+            this.sprite.zIndex = -10
             this.sprite.height = renderer.height
             this.sprite.width = 50
             this.sprite.x = this.sprite.width/2
             this.sprite.y = renderer.height/2
             break
         case 'right':
+            this.sprite.zIndex = -11
             this.sprite.height = renderer.height
             this.sprite.width = 50
             this.sprite.x = renderer.width - this.sprite.width/2
             this.sprite.y = renderer.height/2
             break
         case 'top':
-            this.sprite.height = 50
+            this.sprite.zIndex = -12
+            this.sprite.height = 100
             this.sprite.width = renderer.width
             this.sprite.x = renderer.width/2
             this.sprite.y = this.sprite.height/2
             break
         case 'bottom':
+            this.sprite.zIndex = -13
             this.sprite.height = 50
             this.sprite.width = renderer.width
             this.sprite.x = renderer.width/2

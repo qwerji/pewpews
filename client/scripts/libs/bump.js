@@ -600,7 +600,7 @@ var Bump = (function () {
 
   }, {
     key: "rectangleCollision",
-    value: function rectangleCollision(r1, r2) {
+    value: function rectangleCollision(r1, r2, cb) {
       var bounce = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
       var global = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
 
@@ -710,6 +710,7 @@ var Bump = (function () {
 
         //Return the collision string. it will be either "top", "right",
         //"bottom", or "left" depending on which side of r1 is touching r2.
+      if (cb && typeof cb === 'function' && collision !== undefined) { cb(collision) }
       return collision;
     }
 

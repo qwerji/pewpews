@@ -38,14 +38,19 @@ Player.prototype.takeDamage = function(source) {
 
 Player.prototype.die = function() {
 
+    if (this.sword) {
+        this.sword.drop()
+    }
+
     this.isAlive = false
     this.sprite.x = 100000
     this.sprite.y = 100000
     this.healthBar.x = this.sprite.x - this.healthBar.width / 2
     this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
     const respawnTimer = setTimeout(function() {
-        this.sprite.x = randomInt(0, renderer.width)
-        this.sprite.y = randomInt(0, renderer.height)
+        const spawnPoint = game.getSpawnPoint()
+        this.sprite.x = spawnPoint.x
+        this.sprite.y = spawnPoint.y
         this.isAlive = true
         this.health = 100
         clearTimeout(respawnTimer)
@@ -66,8 +71,8 @@ Player.prototype.fire = function(direction) {
             const projectile = new Projectile()
             projectile.setup(direction, 1, stage, this)
             game.projectiles.push(projectile)
-                // Sets a delay on the rate projectiles are fired
-                this.coolDown()
+            // Sets a delay on the rate projectiles are fired
+            this.coolDown()
         }
     }
         // Clears any existing timer
@@ -83,9 +88,7 @@ Player.prototype.ceaseFire = function() {
 }
 
 Player.prototype.setupKeyboard = function() {
-
     const keys = this.keys
-
     keys.W = keyboard(87)
     keys.A = keyboard(65)
     keys.S = keyboard(83)
@@ -94,7 +97,6 @@ Player.prototype.setupKeyboard = function() {
     keys.Left = keyboard(37)
     keys.Right = keyboard(39)
     keys.Down = keyboard(40)
-
 }
 
 Player.prototype.coolDown = function() {
@@ -113,15 +115,16 @@ Player.prototype.setup = function(textureName, stage) {
     this.sprite.height = 100
     this.sprite.width = 100
     this.sprite.anchor.set(.5, .5)
-    this.sprite.x = renderer.width / 2
-    this.sprite.y = renderer.height / 2
+    const spawnPoint = game.getSpawnPoint()
+    this.sprite.x = spawnPoint.x
+    this.sprite.y = spawnPoint.y
     this.sprite.zIndex = 0
 
     if (this.gamePadIndex === undefined) {
         this.setupKeyboard()
     }
 
-    this.healthBar = new PIXI.Text(`${this.health}`, game.constants.healthBarTextStyle);
+    this.healthBar = new PIXI.Text(this.health, game.constants.healthBarTextStyle);
     this.healthBar.zIndex = 10
 
     this.sprite.addChild(this.healthBar)

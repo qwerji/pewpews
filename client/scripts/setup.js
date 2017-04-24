@@ -4,7 +4,7 @@ console.log('Devs: punkty, qwerji')
 console.log('%c 🐌', 'font-size: 40px;')
 
 //Create the renderer
-var renderer = PIXI.autoDetectRenderer(
+const renderer = PIXI.autoDetectRenderer(
     1600, 1000,
     {
         antialias: true, 
@@ -17,12 +17,12 @@ var renderer = PIXI.autoDetectRenderer(
 document.body.appendChild(renderer.view);
 
 //Create a container object called the `stage`
-var stage = new PIXI.Container();
-var bounds = new PIXI.Graphics();
+const stage = new PIXI.Container();
+const bounds = new PIXI.Graphics();
 bounds.beginFill(0x323232);
 bounds.drawRect(0, 0, renderer.width, renderer.height);
 bounds.endFill();
-bounds.zIndex = -1
+bounds.zIndex = -10000
 stage.addChild(bounds)
 
 // Initialize Collision Library
