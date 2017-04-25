@@ -174,14 +174,15 @@ function Game() {
         this.players = []
         this.projectiles = []
 
-        // const player = new Player()
-        // player.setup('fat', stage)
-        // this.players.push(player)
 
         this.levelManager.getLevel(2, function(level) {
             this.sword = level.sword
             this.obstacles = level.obstacles
             this.spawnPoints = level.spawnPoints
+            
+            // const player = new Player()
+            // player.setup('fat', stage)
+            // this.players.push(player)
 
             fpsInterval = setInterval(this.displayfps, 200)
 

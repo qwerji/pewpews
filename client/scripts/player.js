@@ -141,35 +141,10 @@ Player.prototype.updatePadInput = function() {
     // Xbox Controller
 
     // Movement
-    const axes = gpState.axes,
-        sensitivity = 0.3
-        // UP
-    if (axes[1] <= -sensitivity) {
-        this.vy = -this.speed
-    } else {
-        this.ySlowing = true
-    }
+    const axes = gpState.axes
 
-    // RIGHT
-    if (axes[0] >= sensitivity) {
-        this.vx = this.speed
-    } else {
-        this.xSlowing = true
-    }
-
-    // DOWN
-    if (axes[1] >= sensitivity) {
-        this.vy = this.speed
-    } else {
-        this.ySlowing = true
-    }
-
-    // LEFT
-    if (axes[0] <= -sensitivity) {
-        this.vx = -this.speed
-    } else {
-        this.xSlowing = true
-    }
+    this.vy = this.speed * axes[1]
+    this.vx = this.speed * axes[0]
 
     // Firing
 
@@ -207,39 +182,37 @@ Player.prototype.updatePadInput = function() {
 Player.prototype.updateKeyInput = function() {
 
     const keys = this.keys
-
+    const axes = {
+        x: 0,
+        y: 0
+    }
     // Movement
 
     // UP
     if (keys.W.isDown) {
-        this.vy = -this.speed
-    } else {
-        this.ySlowing = true
+        axes.y += -1
     }
 
     // RIGHT
     if (keys.D.isDown) {
-        this.vx = this.speed
-    } else {
-        this.xSlowing = true
+        axes.x += 1
     }
 
     // DOWN
     if (keys.S.isDown) {
-        this.vy = this.speed
-    } else {
-        this.ySlowing = true
+        axes.y += 1
     }
 
     // LEFT
     if (keys.A.isDown) {
-        this.vx = -this.speed
-    } else {
-        this.xSlowing = true
+        axes.x += -1
     }
+    
+    this.vx = this.speed * axes.x
+    this.vy = this.speed * axes.y
 
     // Firing
-
+    
     // UP
     if (keys.Up.isDown) {
         this.fire("up")
@@ -287,13 +260,6 @@ Player.prototype.update = function() {
 
     this.sprite.x += this.vx * game.deltaTime
     this.sprite.y += this.vy * game.deltaTime
-
-    if (this.xSlowing) {
-        this.vx *= this.easing
-    }
-    if (this.ySlowing) {
-        this.vy *= this.easing
-    }
 
     this.healthBar.text = this.health
     this.healthBar.x = this.sprite.x - this.healthBar.width / 2
