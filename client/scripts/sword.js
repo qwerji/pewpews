@@ -3,18 +3,21 @@ function Sword() {
     this.vy = 0
     this.speed = 900
     this.source = null
-    this.damage = 100
+    this.damage = 25
     this.carrier = null
     this.verticalSprite = null
     this.horizontalSprite = null
     this.sprite = null
     this.xOff = 40
     this.yOff = -30
-    this.durability = 5
-    this.totalDurability = 5
+    this.throws = 5
+    this.totalThrows = 5
+    this.bounces = 5
+    this.totalBounces = 5
     this.spawnPoint = null
     this.respawnTime = 5000
     this.easing = 0.6
+    this.initialDirection = null
 }
 
 Sword.prototype.equippedBy = function(player) {
@@ -22,33 +25,38 @@ Sword.prototype.equippedBy = function(player) {
 }
 
 Sword.prototype.throw = function(direction) {
-
-    if(!this.carrier) return
-
+    //if(!this.carrier) return
+    
     this.carrier.sword = null
     
     this.setSprite(direction)
-
+    if(this.throws){
+        this.throws -= 1
+    }
     switch (direction) {
         case "up":
+            this.initialDirection = "vertical"
             this.vx = this.carrier.vx
             this.vy = -this.speed + this.carrier.vy
             this.sprite.x = this.carrier.sprite.x
             this.sprite.y = this.carrier.sprite.y - this.carrier.sprite.halfHeight
             break
         case "right":
+            this.initialDirection = "horizontal"
             this.vx = this.speed + this.carrier.vx
             this.vy = this.carrier.vy
             this.sprite.x = this.carrier.sprite.x + this.carrier.sprite.halfWidth
             this.sprite.y = this.carrier.sprite.y
             break
         case "down":
+            this.initialDirection = "vertical"
             this.vx = this.carrier.vx
             this.vy = this.speed + this.carrier.vy
             this.sprite.x = this.carrier.sprite.x
             this.sprite.y = this.carrier.sprite.y + this.carrier.sprite.halfHeight
             break
         case "left":
+            this.initialDirection = "horizontal"
             this.vx = -this.speed + this.carrier.vx
             this.vy = this.carrier.vy
             this.sprite.x = this.carrier.sprite.x - this.carrier.sprite.halfWidth
@@ -64,53 +72,84 @@ Sword.prototype.drop = function(hit) {
     if (typeof hit === 'object') {
         hit = hit.keys().next().value
     }
-    
-    switch(hit) {
+    // Allows the sword to bounce off obstacles and walls
+    if (this.bounces) {
+        switch(hit) {
         case 'top':
             this.vy *= -1
-            this.setSprite('down')
+            if(this.initialDirection ==="vertical"){
+                this.setSprite('down')
+            }
             break
         case 'bottom':
             this.vy *= -1
+            if(this.initialDirection ==="vertical"){
             this.setSprite('up')
+            }
             break
         case 'left':
             this.vx *= -1
-            this.setSprite('right')
+            if(this.initialDirection ==="horizontal"){            
+                this.setSprite('right')
+            }
             break
         case 'right':
             this.vx *= -1
-            this.setSprite('left')
+            if(this.initialDirection ==="horizontal"){
+                this.setSprite('left')
+            }
             break
         default:
             break
-    }
-
-    this.vx *= this.easing
-    this.vy *= this.easing
-
-    if (this.durability !== 0) {
-        this.durability -= 1
+        }
     } else {
+        switch(hit) {
+        case 'top':
+            if(this.initialDirection === "vertical"){
+                this.setSprite('up')
+            }
+            break
+        case 'bottom':
+            if(this.initialDirection === "vertical"){
+                this.setSprite('down')
+            }
+            break
+        case 'left':
+            if(this.initialDirection === "horizontal"){
+                this.setSprite('left')
+            }
+            break
+        case 'right':
+            if(this.initialDirection === "horizontal"){
+                this.setSprite('right')
+            }
+            break
+        default:
+            break
+        }
+        //If all bounces have happened, allow the sword to be picked up by any player
         if (this.carrier) {
             this.carrier.sword = null
+            this.carrier = null
+            this.initialDirection = null
         }
-        this.carrier = null
-
+        this.bounces = this.totalBounces
         this.vx = 0
         this.vy = 0
-        this.sprite.x = -10000
-        this.sprite.y = -10000
-
-        const respawnTimer = setTimeout(function() {
-            this.sprite.x = this.spawnPoint.x
-            this.sprite.y = this.spawnPoint.y
-            this.setSprite('up')
-            this.durability = this.totalDurability
-            clearTimeout(respawnTimer)
-        }.bind(this), this.respawnTime)
-
+        //If the sword has been thrown too many times remove from play for 5 seconds
+        if (!this.throws) {
+            this.sprite.x = -10000
+            this.sprite.y = -10000
+            const respawnTimer = setTimeout(function() {
+                this.sprite.x = this.spawnPoint.x
+                this.sprite.y = this.spawnPoint.y
+                this.setSprite('up')
+                this.throws = this.totalThrows
+                clearTimeout(respawnTimer)
+            }.bind(this), this.respawnTime)
+        }
     }
+    this.bounces -= 1
 }
 
 Sword.prototype.update = function() {
@@ -145,7 +184,6 @@ Sword.prototype.setup = function(pos, textureName, stage) {
 }
 
 Sword.prototype.setSprite = function(orientation) {
-
     const pos = {
         x: this.sprite.x,
         y: this.sprite.y
