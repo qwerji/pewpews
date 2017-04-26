@@ -253,6 +253,14 @@ function Game() {
         this.players.push(player)
     }
 
+    this.removePlayer = i => {
+        const deleted = this.players.splice(i,1)[0]
+        deleted.sprite.destroy(false)
+        deleted.healthBar.destroy(false)
+        stage.removeChild(deleted.sprite)
+        stage.removeChild(deleted.healthBar)
+    }
+
     this.getSpawnPoint = () => {
         return this.spawnPoints[randomInt(0,this.spawnPoints.length - 1)]
     }
