@@ -27,6 +27,19 @@ function Player(gamePadIndex) {
     this.isAlive = true
     this.respawnTime = 5000
 
+    this.controllerLayout = {
+        axes: {
+            x: 0,
+            y: 1
+        },
+        buttons: {
+            up: 3,
+            right: 1,
+            down: 0,
+            left: 2
+        }
+    }
+
 }
 
 Player.prototype.takeDamage = function(source) {
@@ -89,14 +102,14 @@ Player.prototype.ceaseFire = function() {
 
 Player.prototype.setupKeyboard = function() {
     const keys = this.keys
-    keys.W = keyboard(87)
-    keys.A = keyboard(65)
-    keys.S = keyboard(83)
-    keys.D = keyboard(68)
-    keys.Up = keyboard(38)
-    keys.Left = keyboard(37)
-    keys.Right = keyboard(39)
-    keys.Down = keyboard(40)
+    keys.walkUp = keyboard(87)
+    keys.walkRight = keyboard(68)
+    keys.walkDown = keyboard(83)
+    keys.walkLeft = keyboard(65)
+    keys.fireUp = keyboard(38)
+    keys.fireRight = keyboard(39)
+    keys.fireDown = keyboard(40)
+    keys.fireLeft = keyboard(37)
 }
 
 Player.prototype.coolDown = function() {
@@ -137,42 +150,44 @@ Player.prototype.getGamePadInfo = function() {
 
 Player.prototype.updatePadInput = function() {
     const gpState = this.getGamePadInfo()
-
+    if (!gpState) return
     // Xbox Controller
 
     // Movement
-    const axes = gpState.axes
+    const axes = gpState.axes,
+        axesLayout = this.controllerLayout.axes
 
-    this.vy = this.speed * axes[1]
-    this.vx = this.speed * axes[0]
+    this.vy = this.speed * axes[axesLayout.y]
+    this.vx = this.speed * axes[axesLayout.x]
 
     // Firing
 
-    const buttons = gpState.buttons
+    const buttons = gpState.buttons,
+        buttonsLayout = this.controllerLayout.buttons
 
     // UP
-    if (buttons[3].pressed) {
+    if (buttons[buttonsLayout.up].pressed) {
         this.fire("up")
     } else {
         this.ceaseFire()
     }
 
     // RIGHT
-    if (buttons[1].pressed) {
+    if (buttons[buttonsLayout.right].pressed) {
         this.fire("right")
     } else {
         this.ceaseFire()
     }
 
     // DOWN
-    if (buttons[0].pressed) {
+    if (buttons[buttonsLayout.down].pressed) {
         this.fire("down")
     } else {
         this.ceaseFire()
     }
 
     // LEFT
-    if (buttons[2].pressed) {
+    if (buttons[buttonsLayout.left].pressed) {
         this.fire("left")
     } else {
         this.ceaseFire()
@@ -181,30 +196,31 @@ Player.prototype.updatePadInput = function() {
 
 Player.prototype.updateKeyInput = function() {
 
-    const keys = this.keys
-    const axes = {
-        x: 0,
-        y: 0
-    }
+    const keys = this.keys,
+        axes = {
+            x: 0,
+            y: 0
+        }
+
     // Movement
 
     // UP
-    if (keys.W.isDown) {
+    if (keys.walkUp.isDown) {
         axes.y += -1
     }
 
     // RIGHT
-    if (keys.D.isDown) {
+    if (keys.walkRight.isDown) {
         axes.x += 1
     }
 
     // DOWN
-    if (keys.S.isDown) {
+    if (keys.walkDown.isDown) {
         axes.y += 1
     }
 
     // LEFT
-    if (keys.A.isDown) {
+    if (keys.walkLeft.isDown) {
         axes.x += -1
     }
     
@@ -214,28 +230,28 @@ Player.prototype.updateKeyInput = function() {
     // Firing
     
     // UP
-    if (keys.Up.isDown) {
+    if (keys.fireUp.isDown) {
         this.fire("up")
     } else {
         this.ceaseFire()
     }
 
     // RIGHT
-    if (keys.Right.isDown) {
+    if (keys.fireRight.isDown) {
         this.fire("right")
     } else {
         this.ceaseFire()
     }
 
     // DOWN
-    if (keys.Down.isDown) {
+    if (keys.fireDown.isDown) {
         this.fire("down")
     } else {
         this.ceaseFire()
     }
 
     // LEFT
-    if (keys.Left.isDown) {
+    if (keys.fireLeft.isDown) {
         this.fire("left")
     } else {
         this.ceaseFire()
