@@ -9,6 +9,7 @@ function Game() {
     let fpsTimer = new Date().getTime(),
         fpsInterval
     this.levelManager = null
+    this.soundManager = null
     this.spawnPoints = null
 
     this.gameLoop = () => {
@@ -166,6 +167,7 @@ function Game() {
 
     this.setup = () => {
         this.levelManager = new LevelManager()
+        this.soundManager = new SoundManager()
 
         this.gamePads = new Gamepad()
         this.gamePads.setup()
@@ -174,15 +176,14 @@ function Game() {
         this.players = []
         this.projectiles = []
 
-
         this.levelManager.getLevel(2, function(level) {
             this.sword = level.sword
             this.obstacles = level.obstacles
             this.spawnPoints = level.spawnPoints
             
-            // const player = new Player()
-            // player.setup('fat', stage)
-            // this.players.push(player)
+            const player = new Player()
+            player.setup('fat', stage)
+            this.players.push(player)
 
             fpsInterval = setInterval(this.displayfps, 200)
 

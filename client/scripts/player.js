@@ -15,7 +15,7 @@ function Player(gamePadIndex) {
     //Movement
     this.vx = 0
     this.vy = 0
-    this.speed = 250
+    this.speed = 270
     this.easing = 0.75
 
     //Shooting
@@ -43,6 +43,7 @@ function Player(gamePadIndex) {
 }
 
 Player.prototype.takeDamage = function(source) {
+    game.soundManager.play.playerHit()
     this.health -= source.damage
     if (this.health <= 0) {
         this.die()
@@ -52,7 +53,8 @@ Player.prototype.takeDamage = function(source) {
 Player.prototype.die = function() {
 
     if (this.sword) {
-        this.sword.drop()
+        this.sword.carrier = null
+        this.sword = null
     }
 
     this.isAlive = false
@@ -80,6 +82,7 @@ Player.prototype.fire = function(direction) {
     } else {
         // Checks if player can fire
         if (this.canFire) {
+            game.soundManager.play.pew()
             // Creates a projectile from the desired direction and texture
             const projectile = new Projectile()
             projectile.setup(direction, 1, stage, this)
@@ -258,6 +261,7 @@ Player.prototype.updateKeyInput = function() {
     }
 }
 Player.prototype.getSword = function(sword) {
+    game.soundManager.play.swordPickup()
     this.sword = sword
     this.sword.setSprite('up')
 }

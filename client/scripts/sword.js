@@ -12,8 +12,8 @@ function Sword() {
     this.yOff = -30
     this.throws = 5
     this.totalThrows = 5
-    this.bounces = 5
-    this.totalBounces = 5
+    this.bounces = 4
+    this.totalBounces = 4
     this.spawnPoint = null
     this.respawnTime = 5000
     this.easing = 0.6
@@ -73,6 +73,7 @@ Sword.prototype.drop = function(hit) {
         hit = hit.keys().next().value
     }
     // Allows the sword to bounce off obstacles and walls
+    game.soundManager.play.swordHit(this.bounces)
     if (this.bounces) {
         switch(hit) {
         case 'top':
@@ -102,6 +103,7 @@ Sword.prototype.drop = function(hit) {
         default:
             break
         }
+        this.bounces -= 1
     } else {
         switch(hit) {
         case 'top':
@@ -149,7 +151,6 @@ Sword.prototype.drop = function(hit) {
             }.bind(this), this.respawnTime)
         }
     }
-    this.bounces -= 1
 }
 
 Sword.prototype.update = function() {
