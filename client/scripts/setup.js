@@ -5,7 +5,7 @@ console.log('%c 🐌', 'font-size: 40px;')
 
 //Create the renderer
 const renderer = PIXI.autoDetectRenderer(
-    1600, 1000,
+    1600, 1200,
     {
         antialias: true, 
         transparent: false, 
@@ -17,10 +17,11 @@ const renderer = PIXI.autoDetectRenderer(
 document.body.appendChild(renderer.view);
 
 //Create a container object called the `stage`
+const statusBarOffset = 200
 const stage = new PIXI.Container();
 const bounds = new PIXI.Graphics();
 bounds.beginFill(0x323232);
-bounds.drawRect(0, 0, renderer.width, renderer.height);
+bounds.drawRect(0, 0, renderer.width, renderer.height-statusBarOffset);
 bounds.endFill();
 bounds.zIndex = -10000
 stage.addChild(bounds)
@@ -35,6 +36,7 @@ document.body.appendChild(fpsDisplay)
 
 PIXI.loader
     .add('fat', 'images/sprites/players/cowbro.png')
+    .add('temp-avatar', 'images/sprites/players/temp-avatar.png')
     .add('obstacle', 'images/sprites/terrain/obstacle.png')
     .add('wall', 'images/sprites/terrain/wall.png')
     .add('0', 'images/sprites/projectiles/projectile_0.png')

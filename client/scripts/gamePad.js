@@ -48,7 +48,6 @@ function Gamepad() {
                     			for (let j = game.players.length-1; j >= 0; j--) {
                     				const player = game.players[j]
                     				if (player.gamePadIndex === i) {
-                    					// console.log('Spliced')
                     					game.removePlayer(j)
                     					break
                     				}

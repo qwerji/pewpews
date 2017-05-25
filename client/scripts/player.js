@@ -1,8 +1,9 @@
 function Player(gamePadIndex) {
     
     this.sprite = null
-    this.healthBar = null
-    this.sword = null    
+    this.badge = null
+    this.sword = null
+    this.score = 0
     this.gamePadIndex = gamePadIndex
     this.keys = {}
 
@@ -42,12 +43,18 @@ function Player(gamePadIndex) {
 
 }
 
-Player.prototype.takeDamage = function(source) {
+Player.prototype.takeDamage = function(weapon) {
     game.soundManager.play.playerHit()
-    this.health -= source.damage
+    this.health -= weapon.damage
     if (this.health <= 0) {
+        if (weapon.carrier) {
+            weapon.carrier.badge.updateScore()
+        } else if (weapon.source) {
+            weapon.source.badge.updateScore()
+        }
         this.die()
     }
+    this.badge.updateHealth()
 }
 
 Player.prototype.die = function() {
@@ -60,14 +67,13 @@ Player.prototype.die = function() {
     this.isAlive = false
     this.sprite.x = 100000
     this.sprite.y = 100000
-    this.healthBar.x = this.sprite.x - this.healthBar.width / 2
-    this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
     const respawnTimer = setTimeout(function() {
         const spawnPoint = game.getSpawnPoint()
         this.sprite.x = spawnPoint.x
         this.sprite.y = spawnPoint.y
         this.isAlive = true
         this.health = 100
+        this.badge.updateHealth()
         clearTimeout(respawnTimer)
     }.bind(this), this.respawnTime)
 
@@ -140,11 +146,10 @@ Player.prototype.setup = function(textureName, stage) {
         this.setupKeyboard()
     }
 
-    this.healthBar = new PIXI.Text(this.health, game.constants.healthBarTextStyle);
-    this.healthBar.zIndex = 10
+    this.badge = new Badge()
+    this.badge.setup(this, stage)
 
-    this.sprite.addChild(this.healthBar)
-    stage.addChild(this.sprite, this.healthBar)
+    stage.addChild(this.sprite)
 }
 
 Player.prototype.getGamePadInfo = function() {
@@ -265,29 +270,21 @@ Player.prototype.getSword = function(sword) {
     this.sword = sword
     this.sword.setSprite('up')
 }
-Player.prototype.update = function() {
-    if(this.sword){
-        this.sword.sprite.x = this.sprite.x + this.sword.xOff
-        this.sword.sprite.y = this.sprite.y + this.sword.yOff
-    }
-    // Update health bar
 
+Player.prototype.updateInput = function() {
     if (this.gamePadIndex !== undefined) {
         this.updatePadInput()
     } else {
         this.updateKeyInput()
     }
+}
+
+Player.prototype.update = function() {
+    if(this.sword){
+        this.sword.sprite.x = this.sprite.x + this.sword.xOff
+        this.sword.sprite.y = this.sprite.y + this.sword.yOff
+    }
 
     this.sprite.x += this.vx * game.deltaTime
     this.sprite.y += this.vy * game.deltaTime
-
-    this.healthBar.text = this.health
-    this.healthBar.x = this.sprite.x - this.healthBar.width / 2
-
-    if (this.sprite.y < 90) {
-        this.healthBar.y = this.sprite.y + this.sprite.halfHeight
-    } else {
-        this.healthBar.y = this.sprite.y - this.sprite.halfHeight - 40
-    }
-
 }

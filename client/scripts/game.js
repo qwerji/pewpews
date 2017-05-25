@@ -32,7 +32,7 @@ function Game() {
         if (this.sword.carrier && !this.sword.carrier.sword) {
             BUMP.contain(
                 this.sword.sprite, 
-                { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 },
+                { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 - statusBarOffset },
                 false,
                 hit => {
                     this.sword.drop(hit)
@@ -51,7 +51,7 @@ function Game() {
             // Projectile vs Wall Collision
             BUMP.contain(
                 projectile.sprite, 
-                { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 },
+                { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 - statusBarOffset },
                 true,
                 hit => {
                     projectileShouldBeRemoved = true
@@ -84,21 +84,9 @@ function Game() {
             const player = this.players[idx]
             if (player.isAlive) {
 
-                player.update()
-
                 avgX += player.sprite.x
                 avgY += player.sprite.y
                 living++
-
-                // Player v wall 
-                BUMP.contain(
-                    player.sprite, 
-                    { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 },
-                    true,
-                    hit => {
-                        // console.log(hit)
-                    }
-                )
 
                 // Projectile vs Players Loop
                 for (let j = this.projectiles.length - 1; j >= 0; j--) {
@@ -110,6 +98,9 @@ function Game() {
                         }
                     }
                 }
+
+                player.updateInput()
+
                 // Player vs PLayer Collisions
                 for (let k = this.players.length - 1; k >= 0; k--) {
                     const otherPlayer = this.players[k]
@@ -125,6 +116,19 @@ function Game() {
                         )
                     }
                 }
+
+                player.update()
+
+                // Player v wall 
+                BUMP.contain(
+                    player.sprite, 
+                    { x: 50, y: 50, width: renderer.width - 50, height: renderer.height - 50 - statusBarOffset },
+                    true,
+                    hit => {
+                        // console.log(hit)
+                    }
+                )
+
                 // Obstacle vs Player Collision
                 for (let obstacleIdx = this.obstacles.length - 1; obstacleIdx >= 0; obstacleIdx--) {
 
@@ -141,7 +145,7 @@ function Game() {
                     if (!this.sword.carrier) {
                         this.sword.equippedBy(player)
                         player.getSword(this.sword)
-                    } else if (!player.sword && !(this.sword.carrier === player) && 
+                    } else if (!player.sword && this.sword.carrier !== player && 
                         (Math.abs(this.sword.vy) > 0 || Math.abs(this.sword.vx) > 0)) {
                         player.takeDamage(this.sword)
                     }
@@ -181,9 +185,9 @@ function Game() {
             this.obstacles = level.obstacles
             this.spawnPoints = level.spawnPoints
             
-            const player = new Player()
-            player.setup('fat', stage)
-            this.players.push(player)
+            // const player = new Player(null, 0)
+            // player.setup('fat', stage)
+            // this.players.push(player)
 
             fpsInterval = setInterval(this.displayfps, 200)
 
@@ -193,7 +197,7 @@ function Game() {
     }
 
     this.handlePlayerCollision = (collision, p1, p2) => {
-
+        
         if (!collision) return
 
         const p1x = Math.abs(p1.vx),
@@ -201,51 +205,66 @@ function Game() {
             p2x = Math.abs(p2.vx),
             p2y = Math.abs(p2.vy)
 
+        // console.log('PRE CHANGE')
+        // console.log('p1', p1x, p1y)
+        // console.log('p2', p2x, p2y)
+
         switch (collision) {
             case "top":
                 if (p1y > p2y) {
                     p2.vy = p1.vy / 2
+                    p1.vy = p1.vy / 2
                 } else if (p1y === p2y) {
                     p1.vy = 0
                     p2.vy = 0
                 } else {
                     p1.vy = p2.vy / 2
+                    p2.vy = p2.vy / 2
                 }
                 break
             case "right":
                 if (p1x > p2x) {
                     p2.vx = p1.vx / 2
+                    p1.vx = p1.vx / 2
                 } else if (p1x === p2x) {
                     p1.vx = 0
                     p2.vx = 0
                 } else {
                     p1.vx = p2.vx / 2
+                    p2.vx = p2.vx / 2
                 }
                 break
             case "bottom":
                 if (p1y > p2y) {
                     p2.vy = p1.vy / 2
+                    p1.vy = p1.vy / 2
                 } else if (p1y === p2y) {
                     p1.vy = 0
                     p2.vy = 0
                 } else {
                     p1.vy = p2.vy / 2
+                    p2.vy = p2.vy / 2
                 }
                 break
             case "left":
                 if (p1x > p2x) {
                     p2.vx = p1.vx / 2
+                    p1.vx = p1.vx / 2
                 } else if (p1x === p2x) {
                     p1.vx = 0
                     p2.vx = 0
                 } else {
                     p1.vx = p2.vx / 2
+                    p2.vx = p2.vx / 2
                 }
                 break
             default:
                 break
         }
 
+        // console.log('POST CHANGE')
+        // console.log('p1', p1.vx, p1.vy)
+        // console.log('p2', p2.vx, p2.vy)
     }
 
     this.addPlayer = gamePadIndex => {
@@ -284,9 +303,8 @@ function Game() {
 
     this.constants = {
         healthBarTextStyle: new PIXI.TextStyle({
-            fontFamily: 'Arial',
+            fontFamily: 'Monaco',
             fontSize: 24,
-            fontStyle: 'italic',
             fontWeight: 'bold',
             fill: ['#ffffff', '#00ff99'], // gradient
             stroke: '#4a1850',

@@ -85,7 +85,7 @@ Sword.prototype.drop = function(hit) {
         case 'bottom':
             this.vy *= -1
             if(this.initialDirection ==="vertical"){
-            this.setSprite('up')
+                this.setSprite('up')
             }
             break
         case 'left':
@@ -168,6 +168,7 @@ Sword.prototype.setup = function(pos, textureName, stage) {
     this.sprite = this.verticalSprite
     this.sprite.height = 80
     this.sprite.width = 26
+    pos.y -= statusBarOffset - this.sprite.height/2
     this.sprite.x = pos.x
     this.sprite.y = pos.y
     this.spawnPoint = pos
