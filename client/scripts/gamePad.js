@@ -29,26 +29,28 @@ function Gamepad() {
                         // Assume it's not in use
                         let inUse = false
                             // Check against each player
-                        for (let k = game.players.length - 1; k >= 0; k--) {
-                            const playerIdx = game.players[k].gamePadIndex
-                                // If the player is not using a keyboard, and they are using that controller's slot
-                            if ((playerIdx !== undefined) && (gamePad.index === playerIdx)) {
-                                inUse = true
-                                break
+                        for (let k = menu.slots.length - 1; k >= 0; k--) {
+                            if(menu.slots[k].player){
+                                const playerIdx = menu.slots[k].player.gamePadIndex
+                                    // If the player is not using a keyboard, and they are using that controller's slot
+                                if ((playerIdx !== undefined) && (gamePad.index === playerIdx)) {
+                                    inUse = true
+                                    break
+                                }
                             }
                         }
                         if (!inUse) {
                             // Add a new player with that controller
-                            game.addPlayer(gamePad.index)
+                            menu.addPlayer(gamePad.index)
                         }
                     } else {
                     	if (prevState) {
                     		if (prevState[i] !== null) {
                     			// Handle controller disconnect
-                    			for (let j = game.players.length-1; j >= 0; j--) {
-                    				const player = game.players[j]
-                    				if (player.gamePadIndex === i) {
-                    					game.removePlayer(j)
+                    			for (let j = menu.slots.length-1; j >= 0; j--) {
+                    				const player = menu.slots[j].player
+                    				if (player && player.gamePadIndex === i) {
+                    					menu.removePlayer(j)
                     					break
                     				}
                     			}

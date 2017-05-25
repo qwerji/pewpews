@@ -1,7 +1,9 @@
 function Player(gamePadIndex) {
     
     this.sprite = null
+    this.textureName = 'fat'
     this.badge = null
+    this.inMenu = true
     this.sword = null
     this.score = 0
     this.gamePadIndex = gamePadIndex
@@ -128,10 +130,10 @@ Player.prototype.coolDown = function() {
     }.bind(this), this.rateOfFire)
 }
 
-Player.prototype.setup = function(textureName, stage) {
-
+Player.prototype.setup = function() {
+    this.inMenu = false
     this.sprite = new PIXI.Sprite(
-        PIXI.loader.resources[textureName].texture
+        PIXI.loader.resources[this.textureName].texture
     )
 
     this.sprite.height = 100
@@ -153,7 +155,7 @@ Player.prototype.setup = function(textureName, stage) {
 }
 
 Player.prototype.getGamePadInfo = function() {
-    return game.gamePads.getGamepadInfo(this.gamePadIndex)
+    return gamePad.getGamepadInfo(this.gamePadIndex)
 }
 
 Player.prototype.updatePadInput = function() {
@@ -162,43 +164,58 @@ Player.prototype.updatePadInput = function() {
     // Xbox Controller
 
     // Movement
+
     const axes = gpState.axes,
         axesLayout = this.controllerLayout.axes
-
-    this.vy = this.speed * axes[axesLayout.y]
-    this.vx = this.speed * axes[axesLayout.x]
 
     // Firing
 
     const buttons = gpState.buttons,
         buttonsLayout = this.controllerLayout.buttons
 
-    // UP
-    if (buttons[buttonsLayout.up].pressed) {
-        this.fire("up")
-    } else {
-        this.ceaseFire()
-    }
+    if(!this.inMenu){
 
-    // RIGHT
-    if (buttons[buttonsLayout.right].pressed) {
-        this.fire("right")
-    } else {
-        this.ceaseFire()
-    }
+        this.vy = this.speed * axes[axesLayout.y]
+        this.vx = this.speed * axes[axesLayout.x]
 
-    // DOWN
-    if (buttons[buttonsLayout.down].pressed) {
-        this.fire("down")
-    } else {
-        this.ceaseFire()
-    }
+        // UP
+        if (buttons[buttonsLayout.up].pressed) {
+            this.fire("up")
+        } else {
+            this.ceaseFire()
+        }
 
-    // LEFT
-    if (buttons[buttonsLayout.left].pressed) {
-        this.fire("left")
+        // RIGHT
+        if (buttons[buttonsLayout.right].pressed) {
+            this.fire("right")
+        } else {
+            this.ceaseFire()
+        }
+
+        // DOWN
+        if (buttons[buttonsLayout.down].pressed) {
+            this.fire("down")
+        } else {
+            this.ceaseFire()
+        }
+
+        // LEFT
+        if (buttons[buttonsLayout.left].pressed) {
+            this.fire("left")
+        } else {
+            this.ceaseFire()
+        }
     } else {
-        this.ceaseFire()
+        // Menu Controls
+        // CANCEL
+        if (buttons[buttonsLayout.right].pressed) {
+            menu.slots[this.gamePadIndex].cancel()
+        }
+
+        // READY
+        if (buttons[buttonsLayout.down].pressed) {
+            menu.slots[this.gamePadIndex].ready()
+        }
     }
 }
 

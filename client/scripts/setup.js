@@ -19,16 +19,12 @@ document.body.appendChild(renderer.view);
 //Create a container object called the `stage`
 const statusBarOffset = 200
 const stage = new PIXI.Container();
-const bounds = new PIXI.Graphics();
-bounds.beginFill(0x323232);
-bounds.drawRect(0, 0, renderer.width, renderer.height-statusBarOffset);
-bounds.endFill();
-bounds.zIndex = -10000
-stage.addChild(bounds)
 
 // Initialize Collision Library
 const BUMP = new Bump()
 
+const gamePad = new Gamepad()
+const menu = new Menu()
 const game = new Game()
 const fpsDisplay = document.createElement('P')
 fpsDisplay.id = 'fpsDisplay'
@@ -37,6 +33,7 @@ document.body.appendChild(fpsDisplay)
 PIXI.loader
     .add('fat', 'images/sprites/players/cowbro.png')
     .add('temp-avatar', 'images/sprites/players/temp-avatar.png')
+    .add('ready', 'images/sprites/menu/ready.png')
     .add('obstacle', 'images/sprites/terrain/obstacle.png')
     .add('wall', 'images/sprites/terrain/wall.png')
     .add('0', 'images/sprites/projectiles/projectile_0.png')
@@ -47,4 +44,4 @@ PIXI.loader
     .add('5', 'images/sprites/projectiles/projectile_5.png')
     .add('6', 'images/sprites/projectiles/projectile_6.png')
     .add('6h', 'images/sprites/projectiles/projectile_6h.png')
-    .load(game.setup)
+    .load(menu.setup)

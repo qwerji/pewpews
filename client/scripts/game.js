@@ -169,25 +169,26 @@ function Game() {
         requestAnimationFrame(this.gameLoop)
     }
 
-    this.setup = () => {
+    this.start = (players) => {
+        const bounds = new PIXI.Graphics();
+        bounds.beginFill(0x323232);
+        bounds.drawRect(0, 0, renderer.width, renderer.height-statusBarOffset);
+        bounds.endFill();
+        bounds.zIndex = -10000
+        stage.addChild(bounds)
         this.levelManager = new LevelManager()
         this.soundManager = new SoundManager()
 
-        this.gamePads = new Gamepad()
-        this.gamePads.setup()
-
         this.obstacles = []
-        this.players = []
+        this.players = players
         this.projectiles = []
 
         this.levelManager.getLevel(2, function(level) {
             this.sword = level.sword
             this.obstacles = level.obstacles
             this.spawnPoints = level.spawnPoints
-            
-            // const player = new Player(null, 0)
-            // player.setup('fat', stage)
-            // this.players.push(player)
+
+            this.players.forEach(player=> player.setup())
 
             fpsInterval = setInterval(this.displayfps, 200)
 
@@ -265,12 +266,6 @@ function Game() {
         // console.log('POST CHANGE')
         // console.log('p1', p1.vx, p1.vy)
         // console.log('p2', p2.vx, p2.vy)
-    }
-
-    this.addPlayer = gamePadIndex => {
-        const player = new Player(gamePadIndex)
-        player.setup('fat', stage)
-        this.players.push(player)
     }
 
     this.removePlayer = i => {
