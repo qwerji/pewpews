@@ -7,12 +7,16 @@ function Projectile() {
     this.easing = 1
     this.source = null
     this.damage = 0
+    this.currentRotation = 0
+    this.rotationSpeed = 45
 
 }
 
 Projectile.prototype.update = function() {
+    this.currentRotation -= this.rotationSpeed
     this.sprite.x += this.vx * game.deltaTime
     this.sprite.y += this.vy * game.deltaTime
+    this.sprite.rotation = toRadians(this.currentRotation)
 }
 
 Projectile.prototype.setup = function(direction, textureName, stage, source) {
@@ -24,13 +28,12 @@ Projectile.prototype.setup = function(direction, textureName, stage, source) {
     this.sprite = new PIXI.Sprite(
         PIXI.loader.resources[textureName].texture
     )
-    this.sprite.height = 29
-    this.sprite.width = 10
+    this.sprite.height = 15
+    this.sprite.width = 15
     this.sprite.x = originSprite.x
     this.sprite.y = originSprite.y
     this.sprite.anchor.set(.5, .5)
     this.sprite.zIndex = 10
-
 
     switch (direction) {
         case "up":

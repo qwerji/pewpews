@@ -104,7 +104,7 @@ Player.prototype.fire = function(direction) {
             game.soundManager.play.pew()
             // Creates a projectile from the desired direction and texture
             const projectile = new Projectile()
-            projectile.setup(direction, 1, stage, this)
+            projectile.setup(direction, 7, stage, this)
             game.projectiles.push(projectile)
             // Sets a delay on the rate projectiles are fired
             this.coolDown()

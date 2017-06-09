@@ -183,7 +183,7 @@ function Game() {
 
     this.start = players => {
         const bounds = new PIXI.Graphics();
-        bounds.beginFill(0x323232);
+        bounds.beginFill(0xA0A0A0);
         bounds.drawRect(0, 0, renderer.width, renderer.height-statusBarOffset);
         bounds.endFill();
         bounds.zIndex = -10000
