@@ -143,14 +143,25 @@ Sword.prototype.drop = function(hit) {
             this.sprite.x = -10000
             this.sprite.y = -10000
             const respawnTimer = setTimeout(function() {
-                this.sprite.x = this.spawnPoint.x
-                this.sprite.y = this.spawnPoint.y
-                this.setSprite('up')
-                this.throws = this.totalThrows
+                this.reset()
                 clearTimeout(respawnTimer)
             }.bind(this), this.respawnTime)
         }
     }
+}
+
+Sword.prototype.reset = function() {
+    if (this.carrier) {
+        this.carrier.sword = null
+        this.carrier = null
+        this.initialDirection = null
+    }
+    this.vx = 0
+    this.vy = 0
+    this.sprite.x = this.spawnPoint.x
+    this.sprite.y = this.spawnPoint.y
+    this.setSprite('up')
+    this.throws = this.totalThrows
 }
 
 Sword.prototype.update = function() {

@@ -11,10 +11,12 @@ function Game() {
     this.levelManager = null
     this.soundManager = null
     this.spawnPoints = null
+    this.stopLoop = false
 
     this.gameLoop = () => {
+        if (this.stopLoop) return
         this.updateClock()
-
+        let gameShouldEnd = false
         for (let obstacleIdx = this.obstacles.length - 1; obstacleIdx >= 0; obstacleIdx--) {
             const obstacle = this.obstacles[obstacleIdx]
 
@@ -82,6 +84,11 @@ function Game() {
         // Loop through players
         for (let idx = this.players.length - 1; idx >= 0; idx--) {
             const player = this.players[idx]
+            if (player.score >= 1) {
+                gameShouldEnd = true
+                break
+            }
+
             if (player.isAlive) {
 
                 avgX += player.sprite.x
@@ -154,6 +161,11 @@ function Game() {
 
         } // end of players loop
 
+        if (gameShouldEnd) {
+            this.gameover()
+            return
+        }
+
         // Sword Collisions with walls and obstacles
         
         avgX /= living
@@ -169,7 +181,7 @@ function Game() {
         requestAnimationFrame(this.gameLoop)
     }
 
-    this.start = (players) => {
+    this.start = players => {
         const bounds = new PIXI.Graphics();
         bounds.beginFill(0x323232);
         bounds.drawRect(0, 0, renderer.width, renderer.height-statusBarOffset);
@@ -182,6 +194,8 @@ function Game() {
         this.obstacles = []
         this.players = players
         this.projectiles = []
+
+        this.stopLoop = false
 
         this.levelManager.getLevel(2, function(level) {
             this.sword = level.sword
@@ -284,6 +298,29 @@ function Game() {
         const deleted = this.projectiles.splice(idx, 1)[0]
         deleted.sprite.destroy(false)
         stage.removeChild(deleted.sprite)
+    }
+
+    this.gameover = () => {
+        const gameOverMenu = new GameOver()
+
+        let winner = this.players[0]
+        winner.gameState = 'gameover'
+        for (let i = 1; i < this.players.length; i++) {
+            const player = this.players[i]
+            if (player.score > winner.score) {
+                winner = player
+            }
+        }
+
+        gameOverMenu.setup({winner,player:this.players[0]})
+    }
+
+    this.restart = () => {
+        this.players.forEach(player => player.reset(true))
+        this.sword.reset()
+        for (let i = 0; i < this.projectiles.length; i++) {
+            this.removeProjectile(i)
+        }
     }
 
     this.updateClock = () => {

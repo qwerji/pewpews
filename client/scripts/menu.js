@@ -18,7 +18,6 @@ function Menu(){
 
         // If every player is ready
         if(playerCount && (readyCount == playerCount)){
-            stage.removeChild(this.background)
             for(let i = 0;i < this.slots.length;i++){
                 stage.removeChild(this.slots[i].readySprite)
                 stage.removeChild(this.slots[i].characterSprite)
@@ -27,7 +26,7 @@ function Menu(){
             // Start game
             let players = []
             for(let i = 0; i < this.slots.length;i++){
-                if(this.slots[i].player){
+                if(this.slots[i].player) {
                     players.push(this.slots[i].player)
                 }
             }
@@ -70,6 +69,16 @@ function Menu(){
         // deleted.sprite.destroy(false)
         stage.removeChild(deleted.characterSprite)
         renderer.render(stage)
+    }
+
+    this.reset = function() {
+        stage.addChild(this.background)
+        for (let i = 0; i < this.slots.length; i++) {
+            if (this.slots[i].characterSprite) {
+                stage.addChild(this.slots[i].characterSprite)
+            }
+        }
+        requestAnimationFrame(this.menuLoop)
     }
 }
 

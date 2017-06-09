@@ -3,11 +3,11 @@ function Player(gamePadIndex) {
     this.sprite = null
     this.textureName = 'fat'
     this.badge = null
-    this.inMenu = true
     this.sword = null
     this.score = 0
     this.gamePadIndex = gamePadIndex
     this.keys = {}
+    this.respawnTime = null
 
     // THE DREAM LIVES ON
     // #ONEDAY
@@ -26,9 +26,12 @@ function Player(gamePadIndex) {
     this.canFire = true
     this.shootTimer = null
 
-    this.health = 100
+    this.maxHealth = 100
+    this.health = this.maxHealth
     this.isAlive = true
     this.respawnTime = 5000
+
+    this.gameState = 'menu'
 
     this.controllerLayout = {
         axes: {
@@ -69,16 +72,24 @@ Player.prototype.die = function() {
     this.isAlive = false
     this.sprite.x = 100000
     this.sprite.y = 100000
-    const respawnTimer = setTimeout(function() {
-        const spawnPoint = game.getSpawnPoint()
-        this.sprite.x = spawnPoint.x
-        this.sprite.y = spawnPoint.y
-        this.isAlive = true
-        this.health = 100
-        this.badge.updateHealth()
-        clearTimeout(respawnTimer)
+    this.respawnTimer = setTimeout(function() {
+        this.reset()
+        clearTimeout(this.respawnTimer)
     }.bind(this), this.respawnTime)
 
+}
+
+Player.prototype.reset = function(scoreReset) {
+    clearTimeout(this.respawnTimer)
+    const spawnPoint = game.getSpawnPoint()
+    this.sprite.x = spawnPoint.x
+    this.sprite.y = spawnPoint.y
+    this.isAlive = true
+    this.health = this.maxHealth
+    this.gameState = 'game'
+    if (scoreReset) this.score = 0
+    this.badge.updateHealth()
+    this.badge.updateScore(true)
 }
 
 Player.prototype.fire = function(direction) {
@@ -131,7 +142,7 @@ Player.prototype.coolDown = function() {
 }
 
 Player.prototype.setup = function() {
-    this.inMenu = false
+    this.gameState = 'game'
     this.sprite = new PIXI.Sprite(
         PIXI.loader.resources[this.textureName].texture
     )
@@ -158,7 +169,7 @@ Player.prototype.getGamePadInfo = function() {
     return gamePad.getGamepadInfo(this.gamePadIndex)
 }
 
-Player.prototype.updatePadInput = function() {
+Player.prototype.updatePadInput = function(gameover) {
     const gpState = this.getGamePadInfo()
     if (!gpState) return
     // Xbox Controller
@@ -173,39 +184,52 @@ Player.prototype.updatePadInput = function() {
     const buttons = gpState.buttons,
         buttonsLayout = this.controllerLayout.buttons
 
-    if(!this.inMenu){
+    switch (this.gameState) {
+        case 'game':
+            this.vy = this.speed * axes[axesLayout.y]
+            this.vx = this.speed * axes[axesLayout.x]
 
-        this.vy = this.speed * axes[axesLayout.y]
-        this.vx = this.speed * axes[axesLayout.x]
+            // UP
+            if (buttons[buttonsLayout.up].pressed) {
+                this.fire("up")
+            } else {
+                this.ceaseFire()
+            }
 
-        // UP
-        if (buttons[buttonsLayout.up].pressed) {
-            this.fire("up")
-        } else {
-            this.ceaseFire()
-        }
+            // RIGHT
+            if (buttons[buttonsLayout.right].pressed) {
+                this.fire("right")
+            } else {
+                this.ceaseFire()
+            }
 
-        // RIGHT
+            // DOWN
+            if (buttons[buttonsLayout.down].pressed) {
+                this.fire("down")
+            } else {
+                this.ceaseFire()
+            }
+
+            // LEFT
+            if (buttons[buttonsLayout.left].pressed) {
+                this.fire("left")
+            } else {
+                this.ceaseFire()
+            }
+            break
+    case 'gameover':
+        // Gameover Controls
+        // Back to Menu
         if (buttons[buttonsLayout.right].pressed) {
-            this.fire("right")
-        } else {
-            this.ceaseFire()
+            gameover.backToMenu()
         }
 
-        // DOWN
+        // Restart
         if (buttons[buttonsLayout.down].pressed) {
-            this.fire("down")
-        } else {
-            this.ceaseFire()
+            gameover.restart()
         }
-
-        // LEFT
-        if (buttons[buttonsLayout.left].pressed) {
-            this.fire("left")
-        } else {
-            this.ceaseFire()
-        }
-    } else {
+        break
+    case 'menu':
         // Menu Controls
         // CANCEL
         if (buttons[buttonsLayout.right].pressed) {
@@ -216,6 +240,9 @@ Player.prototype.updatePadInput = function() {
         if (buttons[buttonsLayout.down].pressed) {
             menu.slots[this.gamePadIndex].ready()
         }
+        break
+    default:
+        break
     }
 }
 

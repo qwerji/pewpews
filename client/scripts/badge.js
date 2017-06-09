@@ -7,8 +7,8 @@ function Badge() {
 
 }
 
-Badge.prototype.updateScore = function() {
-    this.player.score += 1
+Badge.prototype.updateScore = function(increment) {
+    if (!increment) this.player.score += 1
     this.scoreSprite.text = this.player.score
 }
 
